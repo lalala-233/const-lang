@@ -9,6 +9,7 @@ pub enum Op {
 }
 impl Op {
     pub const OP_CHAR_LIST: [char; 4] = ['+', '-', '*', '/'];
+    pub const LEN_OF_OP: usize = '+'.len_utf8();
     pub fn new(s: &NonWhiteSpaceString) -> Self {
         match s.as_str() {
             "+" => Self::Add,

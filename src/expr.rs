@@ -10,7 +10,7 @@ impl Expr {
     fn new(s: &str) -> Self {
         let nth = s.find(Op::OP_CHAR_LIST).expect("Invalid Expr");
         let (lhs, left) = s.split_at(nth);
-        let (op, rhs) = left.split_at(1);
+        let (op, rhs) = left.split_at(Op::LEN_OF_OP);
         Self {
             lhs: Number::new(&lhs.into()),
             rhs: Number::new(&rhs.into()),

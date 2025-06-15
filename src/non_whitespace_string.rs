@@ -1,4 +1,4 @@
-use std::{ops::Deref, str::FromStr};
+use std::ops::Deref;
 
 /// Store non-empty String
 #[derive(Debug, PartialEq, Eq)]
@@ -19,7 +19,7 @@ impl Deref for NonWhiteSpaceString {
         &self.0
     }
 }
-impl From<&str> for NonWhiteSpaceString{
+impl From<&str> for NonWhiteSpaceString {
     fn from(value: &str) -> Self {
         Self::new(value)
     }

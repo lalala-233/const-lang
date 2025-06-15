@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Identifier(NonWhiteSpaceString);
 
 impl Identifier {

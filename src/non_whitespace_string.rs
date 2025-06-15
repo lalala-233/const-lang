@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 /// Store non-empty String
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct NonWhiteSpaceString(String);
 impl NonWhiteSpaceString {
     fn new(s: &str) -> Self {

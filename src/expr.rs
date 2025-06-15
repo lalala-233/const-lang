@@ -18,6 +18,15 @@ impl Expr {
             op: Op::new(&op.into()),
         }
     }
+    pub const fn eval(&self) -> i32 {
+        let (lhs, rhs) = (self.lhs.inner(), self.rhs.inner());
+        match self.op {
+            Op::Add => lhs + rhs,
+            Op::Sub => lhs - rhs,
+            Op::Mul => lhs * rhs,
+            Op::Div => lhs / rhs,
+        }
+    }
 }
 #[cfg(test)]
 mod tests {
@@ -32,5 +41,18 @@ mod tests {
                 op: Op::Add
             }
         );
+    }
+    #[test]
+    fn eval_add() {
+        assert_eq!(Expr::new("1+2").eval(), 3);
+    }#[test]
+    fn eval_sub() {
+        assert_eq!(Expr::new("15-2").eval(), 13);
+    }#[test]
+    fn eval_mul() {
+        assert_eq!(Expr::new("12*12").eval(), 144);
+    }#[test]
+    fn eval_div() {
+        assert_eq!(Expr::new("9/3").eval(), 3);
     }
 }

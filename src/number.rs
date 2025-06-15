@@ -1,7 +1,8 @@
+use crate::internal::prelude::*;
 #[derive(PartialEq, Eq, Debug)]
-pub struct Number(pub i32);
+pub struct Number(i32);
 impl Number {
-    fn new(s: &str) -> Self {
+    pub fn new(s: &NonWhiteSpaceString) -> Self {
         Self(s.parse().unwrap())
     }
 }
@@ -12,6 +13,6 @@ mod tests {
 
     #[test]
     fn parse_number() {
-        assert_eq!(Number::new("123"), Number(123));
+        assert_eq!(Number::new(&"123".into()), Number(123));
     }
 }

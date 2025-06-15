@@ -1,3 +1,5 @@
+use crate::internal::prelude::*;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Op {
     Add,
@@ -7,8 +9,8 @@ pub enum Op {
 }
 impl Op {
     pub const OP_CHAR_LIST: [char; 4] = ['+', '-', '*', '/'];
-    pub fn new(s: &str) -> Self {
-        match s {
+    pub fn new(s: &NonWhiteSpaceString) -> Self {
+        match s.as_str() {
             "+" => Self::Add,
             "-" => Self::Sub,
             "*" => Self::Mul,
@@ -20,21 +22,20 @@ impl Op {
 #[cfg(test)]
 mod op_tests {
     use super::*;
-    
     #[test]
     fn parse_add_op() {
-        assert_eq!(Op::new("+"), Op::Add);
+        assert_eq!(Op::new(&"+".into()), Op::Add);
     }
     #[test]
     fn parse_sub_op() {
-        assert_eq!(Op::new("-"), Op::Sub);
+        assert_eq!(Op::new(&"-".into()), Op::Sub);
     }
     #[test]
     fn parse_mul_op() {
-        assert_eq!(Op::new("*"), Op::Mul);
+        assert_eq!(Op::new(&"*".into()), Op::Mul);
     }
     #[test]
     fn parse_div_op() {
-        assert_eq!(Op::new("/"), Op::Div);
+        assert_eq!(Op::new(&"/".into()), Op::Div);
     }
 }

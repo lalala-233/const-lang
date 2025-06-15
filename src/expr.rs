@@ -12,9 +12,9 @@ impl Expr {
         let (lhs, left) = s.split_at(nth);
         let (op, rhs) = left.split_at(1);
         Self {
-            lhs: Number(lhs.parse().unwrap()),
-            rhs: Number(rhs.parse().unwrap()),
-            op: Op::new(op),
+            lhs: Number::new(&lhs.into()),
+            rhs: Number::new(&rhs.into()),
+            op: Op::new(&op.into()),
         }
     }
 }
@@ -24,10 +24,10 @@ mod test {
     #[test]
     fn parse_one_add_two() {
         assert_eq!(
-            Expr::new("1+2"),
+            Expr::new(" 1 + 2 "),
             Expr {
-                lhs: Number(1),
-                rhs: Number(2),
+                lhs: Number::new(&"1".into()),
+                rhs: Number::new(&"2".into()),
                 op: Op::Add
             }
         );

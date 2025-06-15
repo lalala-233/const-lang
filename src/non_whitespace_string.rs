@@ -25,7 +25,7 @@ impl From<&str> for NonWhiteSpaceString {
     }
 }
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     #[test]
     fn non_white_space_string() {

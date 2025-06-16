@@ -14,6 +14,12 @@ impl Expr {
         }
         Err(ExprError::InvalidExpr)
     }
+    const fn eval(&self) -> Value {
+        match self {
+            Self::Number(number) => Value::Number(*number),
+            Self::Operation(operation) => operation.eval(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -38,5 +44,19 @@ mod tests {
         assert_eq!(Expr::new(""), Err(ExprError::InvalidExpr));
         assert_eq!(Expr::new("++"), Err(ExprError::InvalidExpr));
         assert_eq!(Expr::new("1+"), Err(ExprError::InvalidExpr));
+    }
+    #[test]
+    fn eval_operation() {
+        assert_eq!(
+            Expr::new("114+514").unwrap().eval(),
+            Value::Number(Number::from_i32(114 + 514))
+        );
+    }
+    #[test]
+    fn eval_number() {
+        assert_eq!(
+            Expr::new("114").unwrap().eval(),
+            Value::Number(Number::from_i32(114))
+        );
     }
 }

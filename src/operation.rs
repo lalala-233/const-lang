@@ -19,14 +19,15 @@ impl Operation {
             op: Op::new(&op.into())?,
         })
     }
-    pub const fn eval(&self) -> i32 {
+    pub const fn eval(&self) -> Value {
         let (lhs, rhs) = (self.lhs.inner(), self.rhs.inner());
-        match self.op {
+        let value = match self.op {
             Op::Add => lhs + rhs,
             Op::Sub => lhs - rhs,
             Op::Mul => lhs * rhs,
             Op::Div => lhs / rhs,
-        }
+        };
+        Value::Number(Number::from_i32(value))
     }
 }
 #[cfg(test)]
@@ -56,18 +57,30 @@ mod tests {
     }
     #[test]
     fn eval_add() {
-        assert_eq!(Operation::new("1+2").unwrap().eval(), 3);
+        assert_eq!(
+            Operation::new("1+2").unwrap().eval(),
+            Value::Number(Number::from_i32(3))
+        );
     }
     #[test]
     fn eval_sub() {
-        assert_eq!(Operation::new("15-2").unwrap().eval(), 13);
+        assert_eq!(
+            Operation::new("15-2").unwrap().eval(),
+            Value::Number(Number::from_i32(13))
+        );
     }
     #[test]
     fn eval_mul() {
-        assert_eq!(Operation::new("12*12").unwrap().eval(), 144);
+        assert_eq!(
+            Operation::new("12*12").unwrap().eval(),
+            Value::Number(Number::from_i32(144))
+        );
     }
     #[test]
     fn eval_div() {
-        assert_eq!(Operation::new("9/3").unwrap().eval(), 3);
+        assert_eq!(
+            Operation::new("9/3").unwrap().eval(),
+            Value::Number(Number::from_i32(3))
+        );
     }
 }

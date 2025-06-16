@@ -9,7 +9,7 @@ pub struct BindingDef {
 impl BindingDef {
     fn new(s: &str) -> Result<Self, Error> {
         let s = s
-            .strip_prefix("let")
+            .strip_prefix("let ")
             .ok_or(BindingDefError::MissingLetKeyword)?;
         let (identifier, expr) = s
             .split_once('=')
@@ -46,6 +46,13 @@ mod tests {
     fn parse_without_let() {
         assert_eq!(
             BindingDef::new("good morning"),
+            Err(BindingDefError::MissingLetKeyword.into())
+        );
+    }
+    #[test]
+    fn parse_invalid_binding_def() {
+        assert_eq!(
+            BindingDef::new("letdown=1+1"),
             Err(BindingDefError::MissingLetKeyword.into())
         );
     }

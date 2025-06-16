@@ -5,9 +5,14 @@ pub struct Identifier(TrimmedString);
 
 impl Identifier {
     pub fn new(s: TrimmedString) -> Result<Self, IdentifierError> {
-        s.starts_with(|c: char| c.is_alphabetic())
-            .then_some(Self(s))
-            .ok_or(IdentifierError::StartWithNonLetter)
+        if !s.starts_with(char::is_alphabetic) {
+            return Err(IdentifierError::StartWithNonLetter);
+        }
+        if s.chars().any(char::is_whitespace) {
+            return Err(IdentifierError::ContainWhitespace);
+        }
+        // TODO: more checks like ops, keywords, etc.
+        Ok(Self(s))
     }
 }
 
@@ -24,9 +29,23 @@ mod tests {
     }
 
     #[test]
-    fn parse_invalid_identifier() {
+    fn parse_start_with_number() {
         assert_eq!(
             Identifier::new("123foo".into()),
+            Err(IdentifierError::StartWithNonLetter)
+        );
+    }
+    #[test]
+    fn parse_contain_empty() {
+        assert_eq!(
+            Identifier::new("foo bar".into()),
+            Err(IdentifierError::ContainWhitespace)
+        );
+    }
+    #[test]
+    fn parse_empty() {
+        assert_eq!(
+            Identifier::new("".into()),
             Err(IdentifierError::StartWithNonLetter)
         );
     }

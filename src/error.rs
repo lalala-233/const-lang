@@ -30,6 +30,8 @@ pub enum OperatorError {
 pub enum IdentifierError {
     #[error("Identifier must start with a letter")]
     StartWithNonLetter,
+    #[error("Identifier must not contain whitespace")]
+    ContainWhitespace,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum ExprError {

@@ -41,9 +41,12 @@ mod tests {
     }
     #[test]
     fn parse_invalid_expr() {
-        assert_eq!(Expr::new(""), Err(ExprError::InvalidExpr));
         assert_eq!(Expr::new("++"), Err(ExprError::InvalidExpr));
         assert_eq!(Expr::new("1+"), Err(ExprError::InvalidExpr));
+    }
+    #[test]
+    fn parse_empty() {
+        assert_eq!(Expr::new(""), Err(ExprError::InvalidExpr));
     }
     #[test]
     fn eval_operation() {

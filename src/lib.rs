@@ -1,4 +1,5 @@
 mod binding_def;
+mod block;
 mod environment;
 mod error;
 mod expr;
@@ -12,6 +13,7 @@ mod value;
 mod internal {
     pub mod prelude {
         pub use crate::{
+            block::Block,
             environment::Environment,
             error::{BindingDefError, Error, ExprError, IdentifierError, OperatorError},
             expr::Expr,

@@ -32,7 +32,10 @@ pub enum ExpressionError {
     InvalidExpression,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
-pub enum StatementError {}
+pub enum StatementError {
+    #[error("Invalid statement")]
+    InvalidStatement,
+}
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperationError {
     #[error(transparent)]

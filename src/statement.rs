@@ -13,7 +13,7 @@ impl Statement {
         if let Ok(expr) = Expression::new(s) {
             return Ok(Self::Expr(expr));
         }
-        todo!()
+        Err(StatementError::InvalidStatement)
     }
 }
 
@@ -33,5 +33,16 @@ mod tests {
             Statement::new("114+514"),
             Ok(Statement::Expr(Expression::new("114+514").unwrap()))
         );
+    }
+    #[test]
+    fn parse_invalid() {
+        assert_eq!(
+            Statement::new("let a=a=1"),
+            Err(StatementError::InvalidStatement)
+        );
+    }
+    #[test]
+    fn parse_empty() {
+        assert_eq!(Statement::new(""), Err(StatementError::InvalidStatement));
     }
 }

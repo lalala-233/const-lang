@@ -5,14 +5,14 @@ pub enum Expression {
     Operation(Operation),
 }
 impl Expression {
-    pub fn new(s: &str) -> Result<Self, ExprError> {
+    pub fn new(s: &str) -> Result<Self, ExpressionError> {
         if let Ok(op) = Operation::new(s) {
             return Ok(Self::Operation(op));
         }
         if let Ok(number) = Number::new(&s.into()) {
             return Ok(Self::Number(number));
         }
-        Err(ExprError::InvalidExpr)
+        Err(ExpressionError::InvalidExpression)
     }
     const fn eval(&self) -> Value {
         match self {
@@ -41,12 +41,18 @@ mod tests {
     }
     #[test]
     fn parse_invalid_expr() {
-        assert_eq!(Expression::new("++"), Err(ExprError::InvalidExpr));
-        assert_eq!(Expression::new("1+"), Err(ExprError::InvalidExpr));
+        assert_eq!(
+            Expression::new("++"),
+            Err(ExpressionError::InvalidExpression)
+        );
+        assert_eq!(
+            Expression::new("1+"),
+            Err(ExpressionError::InvalidExpression)
+        );
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(Expression::new(""), Err(ExprError::InvalidExpr));
+        assert_eq!(Expression::new(""), Err(ExpressionError::InvalidExpression));
     }
     #[test]
     fn eval_operation() {

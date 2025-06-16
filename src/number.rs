@@ -2,7 +2,7 @@ use crate::internal::prelude::*;
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub struct Number(i32);
 impl Number {
-    pub fn new(s: &TrimmedString) -> Result<Self, Error> {
+    pub fn new(s: &TrimmedString) -> Result<Self, NumberError> {
         Ok(Self(s.parse()?))
     }
     pub const fn inner(self) -> i32 {
@@ -25,7 +25,7 @@ mod tests {
     fn parse_non_number() {
         assert!(matches!(
             Number::new(&"non-number".into()),
-            Err(Error::InvalidNumber(_))
+            Err(NumberError::InvalidNumber(_))
         ));
     }
 }

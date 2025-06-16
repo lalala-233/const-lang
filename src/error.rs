@@ -2,18 +2,7 @@ use std::num::ParseIntError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq, Eq)]
-pub enum Error {
-    #[error("Invalid number")]
-    InvalidNumber(#[from] ParseIntError),
-    #[error("Operator is not found")]
-    OpNotFound,
-    #[error(transparent)]
-    Identifier(#[from] IdentifierError),
-    #[error(transparent)]
-    Operator(#[from] OperatorError),
-    #[error(transparent)]
-    BindingDef(#[from] BindingDefError),
-}
+pub enum Error {}
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BindingDefError {
     #[error("Expect `let` here")]
@@ -21,7 +10,7 @@ pub enum BindingDefError {
     #[error("Expect `=` here")]
     MissingEqualsSign,
     #[error(transparent)]
-    Expr(#[from] ExprError),
+    Expression(#[from] ExpressionError),
     #[error(transparent)]
     Identifier(#[from] IdentifierError),
 }
@@ -38,9 +27,23 @@ pub enum IdentifierError {
     ContainWhitespace,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
-pub enum ExprError {
+pub enum ExpressionError {
     #[error("Invalid expression")]
-    InvalidExpr,
+    InvalidExpression,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum StatementError {}
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum OperationError {
+    #[error(transparent)]
+    Number(#[from] NumberError),
+    #[error("Operator is not found")]
+    OperatorNotFound,
+    #[error(transparent)]
+    Operator(#[from] OperatorError),
+}
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum NumberError {
+    #[error("Invalid number")]
+    InvalidNumber(#[from] ParseIntError),
+}

@@ -31,3 +31,8 @@ pub enum IdentifierError {
     #[error("Identifier must start with a letter")]
     StartWithNonLetter,
 }
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum ExprError {
+    #[error("Invalid expression")]
+    InvalidExpr,
+}

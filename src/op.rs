@@ -10,7 +10,7 @@ pub enum Op {
 impl Op {
     pub const OP_CHAR_LIST: [char; 4] = ['+', '-', '*', '/'];
     pub const LEN_OF_OP: usize = '+'.len_utf8();
-    pub fn new(s: &NonWhiteSpaceString) -> Result<Self, OperatorError> {
+    pub fn new(s: &TrimmedString) -> Result<Self, OperatorError> {
         match s.as_str() {
             "+" => Ok(Self::Add),
             "-" => Ok(Self::Sub),

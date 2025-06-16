@@ -1,10 +1,10 @@
 use crate::internal::prelude::*;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
-pub struct Identifier(NonWhiteSpaceString);
+pub struct Identifier(TrimmedString);
 
 impl Identifier {
-    pub fn new(s: NonWhiteSpaceString) -> Result<Self, IdentifierError> {
+    pub fn new(s: TrimmedString) -> Result<Self, IdentifierError> {
         s.starts_with(|c: char| c.is_alphabetic())
             .then_some(Self(s))
             .ok_or(IdentifierError::StartWithNonLetter)
@@ -12,7 +12,7 @@ impl Identifier {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

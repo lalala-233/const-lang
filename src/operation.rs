@@ -8,6 +8,7 @@ pub struct Operation {
 
 impl Operation {
     pub fn new(s: &str) -> Result<Self, Error> {
+        // find and parse is not the best, but it's simple
         let nth = s.find(Op::OP_CHAR_LIST).ok_or(Error::OpNotFound)?;
         let (lhs, s) = s.split_at(nth);
         let (op, rhs) = s.split_at(Op::LEN_OF_OP);

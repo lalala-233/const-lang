@@ -1,3 +1,3 @@
-pub enum Value{
-    Number(i32)
+pub enum Value {
+    Number(i32),
 }

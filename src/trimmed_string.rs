@@ -2,24 +2,24 @@ use std::ops::Deref;
 
 /// Store non-empty String
 #[derive(Debug, PartialEq, Eq, Hash)]
-pub struct NonWhiteSpaceString(String);
-impl NonWhiteSpaceString {
+pub struct TrimmedString(String);
+impl TrimmedString {
     fn new(s: &str) -> Self {
-        let s = s.chars().filter(|c| !c.is_whitespace()).collect();
-        Self(s)
+        let s = s.trim();
+        Self(s.to_string())
     }
     fn inner(self) -> String {
         self.0
     }
 }
-impl Deref for NonWhiteSpaceString {
+impl Deref for TrimmedString {
     type Target = String;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
-impl From<&str> for NonWhiteSpaceString {
+impl From<&str> for TrimmedString {
     fn from(value: &str) -> Self {
         Self::new(value)
     }
@@ -30,8 +30,8 @@ mod tests {
     #[test]
     fn non_white_space_string() {
         assert_eq!(
-            NonWhiteSpaceString::new(" H e l l o "),
-            NonWhiteSpaceString("Hello".to_string())
+            TrimmedString::new("   H e l l o  "),
+            TrimmedString("H e l l o".to_string())
         );
     }
 }

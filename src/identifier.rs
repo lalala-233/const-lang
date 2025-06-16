@@ -4,12 +4,10 @@ use crate::internal::prelude::*;
 pub struct Identifier(NonWhiteSpaceString);
 
 impl Identifier {
-    pub fn new(s: NonWhiteSpaceString) -> Self {
-        if s.starts_with(|c: char| c.is_alphabetic()) {
-            Self(s)
-        } else {
-            panic!("Identifier must start with a letter")
-        }
+    pub fn new(s: NonWhiteSpaceString) -> Result<Self, IdentifierError> {
+        s.starts_with(|c: char| c.is_alphabetic())
+            .then_some(Self(s))
+            .ok_or(IdentifierError::StartWithNonLetter)
     }
 }
 
@@ -21,13 +19,15 @@ mod test {
     fn parse_identifier() {
         assert_eq!(
             Identifier::new("foo123".into()),
-            Identifier("foo123".into())
+            Ok(Identifier("foo123".into()))
         );
     }
 
     #[test]
-    #[should_panic = "Identifier must start with a letter"]
     fn parse_invalid_identifier() {
-        Identifier::new("123foo".into());
+        assert_eq!(
+            Identifier::new("123foo".into()),
+            Err(IdentifierError::StartWithNonLetter)
+        );
     }
 }

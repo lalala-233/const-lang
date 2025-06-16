@@ -7,16 +7,16 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn new(s: &str) -> Self {
-        let nth = s.find(Op::OP_CHAR_LIST).expect("Invalid Expr");
+    pub fn new(s: &str) -> Result<Self, Error> {
+        let nth = s.find(Op::OP_CHAR_LIST).ok_or(Error::OpNotFound)?;
         let (lhs, s) = s.split_at(nth);
         let (op, rhs) = s.split_at(Op::LEN_OF_OP);
 
-        Self {
-            lhs: Number::new(&lhs.into()),
-            rhs: Number::new(&rhs.into()),
-            op: Op::new(&op.into()),
-        }
+        Ok(Self {
+            lhs: Number::new(&lhs.into())?,
+            rhs: Number::new(&rhs.into())?,
+            op: Op::new(&op.into())?,
+        })
     }
     pub const fn eval(&self) -> i32 {
         let (lhs, rhs) = (self.lhs.inner(), self.rhs.inner());
@@ -34,28 +34,39 @@ mod tests {
     #[test]
     fn parse_one_add_two() {
         assert_eq!(
-            Operation::new(" 1 + 2 "),
-            Operation {
-                lhs: Number::new(&"1".into()),
-                rhs: Number::new(&"2".into()),
+            Operation::new("1+2"),
+            Ok(Operation {
+                lhs: Number::new(&"1".into()).unwrap(),
+                rhs: Number::new(&"2".into()).unwrap(),
                 op: Op::Add
-            }
+            })
+        );
+    }
+    #[test]
+    fn parse_with_whitespace() {
+        assert_eq!(
+            Operation::new(" 12 * 32 "),
+            Ok(Operation {
+                lhs: Number::new(&"12".into()).unwrap(),
+                rhs: Number::new(&"32".into()).unwrap(),
+                op: Op::Mul
+            })
         );
     }
     #[test]
     fn eval_add() {
-        assert_eq!(Operation::new("1+2").eval(), 3);
+        assert_eq!(Operation::new("1+2").unwrap().eval(), 3);
     }
     #[test]
     fn eval_sub() {
-        assert_eq!(Operation::new("15-2").eval(), 13);
+        assert_eq!(Operation::new("15-2").unwrap().eval(), 13);
     }
     #[test]
     fn eval_mul() {
-        assert_eq!(Operation::new("12*12").eval(), 144);
+        assert_eq!(Operation::new("12*12").unwrap().eval(), 144);
     }
     #[test]
     fn eval_div() {
-        assert_eq!(Operation::new("9/3").eval(), 3);
+        assert_eq!(Operation::new("9/3").unwrap().eval(), 3);
     }
 }

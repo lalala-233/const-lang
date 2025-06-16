@@ -10,13 +10,13 @@ pub enum Op {
 impl Op {
     pub const OP_CHAR_LIST: [char; 4] = ['+', '-', '*', '/'];
     pub const LEN_OF_OP: usize = '+'.len_utf8();
-    pub fn new(s: &NonWhiteSpaceString) -> Self {
+    pub fn new(s: &NonWhiteSpaceString) -> Result<Self, OperatorError> {
         match s.as_str() {
-            "+" => Self::Add,
-            "-" => Self::Sub,
-            "*" => Self::Mul,
-            "/" => Self::Div,
-            _ => panic!("Invalid operator."),
+            "+" => Ok(Self::Add),
+            "-" => Ok(Self::Sub),
+            "*" => Ok(Self::Mul),
+            "/" => Ok(Self::Div),
+            _ => Err(OperatorError::InvalidOperator),
         }
     }
 }
@@ -25,18 +25,22 @@ mod op_tests {
     use super::*;
     #[test]
     fn parse_add_op() {
-        assert_eq!(Op::new(&"+".into()), Op::Add);
+        assert_eq!(Op::new(&"+".into()), Ok(Op::Add));
     }
     #[test]
     fn parse_sub_op() {
-        assert_eq!(Op::new(&"-".into()), Op::Sub);
+        assert_eq!(Op::new(&"-".into()), Ok(Op::Sub));
     }
     #[test]
     fn parse_mul_op() {
-        assert_eq!(Op::new(&"*".into()), Op::Mul);
+        assert_eq!(Op::new(&"*".into()), Ok(Op::Mul));
     }
     #[test]
     fn parse_div_op() {
-        assert_eq!(Op::new(&"/".into()), Op::Div);
+        assert_eq!(Op::new(&"/".into()), Ok(Op::Div));
+    }
+    #[test]
+    fn parse_invalid_operator() {
+        assert_eq!(Op::new(&"s".into()), Err(OperatorError::InvalidOperator));
     }
 }

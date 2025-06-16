@@ -7,14 +7,18 @@ pub struct BindingDef {
 }
 
 impl BindingDef {
-    fn new(s: &str) -> Self {
-        let s = s.strip_prefix("let").expect("Expect let");
-        let (identifier, expr) = s.split_once('=').unwrap();
+    fn new(s: &str) -> Result<Self, Error> {
+        let s = s
+            .strip_prefix("let")
+            .ok_or(BindingDefError::MissingLetKeyword)?;
+        let (identifier, expr) = s
+            .split_once('=')
+            .ok_or(BindingDefError::MissingEqualsSign)?;
 
-        Self {
-            name: Identifier::new(identifier.into()),
-            val: Operation::new(expr),
-        }
+        Ok(Self {
+            name: Identifier::new(identifier.into())?,
+            val: Operation::new(expr)?,
+        })
     }
 }
 
@@ -25,10 +29,24 @@ mod tests {
     fn parse_binding_def() {
         assert_eq!(
             BindingDef::new("let foo = 1 + 1"),
-            BindingDef {
-                name: Identifier::new("foo".into()),
-                val: Operation::new("1+1")
-            }
+            Ok(BindingDef {
+                name: Identifier::new("foo".into()).unwrap(),
+                val: Operation::new("1+1").unwrap()
+            })
+        );
+    }
+    #[test]
+    fn parse_without_equal() {
+        assert_eq!(
+            BindingDef::new("let foo 1+1"),
+            Err(BindingDefError::MissingEqualsSign.into())
+        );
+    }
+    #[test]
+    fn parse_without_let() {
+        assert_eq!(
+            BindingDef::new("good morning"),
+            Err(BindingDefError::MissingLetKeyword.into())
         );
     }
 }

@@ -1,5 +1,6 @@
 mod binding_def;
 mod environment;
+mod error;
 mod expr;
 mod identifier;
 mod non_whitespace_string;
@@ -10,13 +11,16 @@ mod value;
 
 mod internal {
     pub mod prelude {
-        pub use crate::environment::Environment;
-        pub use crate::expr::Expr;
-        pub use crate::identifier::Identifier;
-        pub use crate::non_whitespace_string::NonWhiteSpaceString;
-        pub use crate::number::Number;
-        pub use crate::op::Op;
-        pub use crate::operation::Operation;
-        pub use crate::value::Value;
+        pub use crate::{
+            environment::Environment,
+            error::{BindingDefError, Error, IdentifierError, OperatorError},
+            expr::Expr,
+            identifier::Identifier,
+            non_whitespace_string::NonWhiteSpaceString,
+            number::Number,
+            op::Op,
+            operation::Operation,
+            value::Value,
+        };
     }
 }

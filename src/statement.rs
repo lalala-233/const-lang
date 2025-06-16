@@ -2,7 +2,7 @@ use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
 pub enum Statement {
     BindingDef(BindingDef),
-    Expr(Expr),
+    Expr(Expression),
 }
 
 impl Statement {
@@ -10,7 +10,7 @@ impl Statement {
         if let Ok(binding_def) = BindingDef::new(s) {
             return Ok(Self::BindingDef(binding_def));
         }
-        if let Ok(expr) = Expr::new(s) {
+        if let Ok(expr) = Expression::new(s) {
             return Ok(Self::Expr(expr));
         }
         todo!()
@@ -31,7 +31,7 @@ mod tests {
     fn parse_expr() {
         assert_eq!(
             Statement::new("114+514"),
-            Ok(Statement::Expr(Expr::new("114+514").unwrap()))
+            Ok(Statement::Expr(Expression::new("114+514").unwrap()))
         );
     }
 }

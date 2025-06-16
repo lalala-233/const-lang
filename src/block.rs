@@ -1,7 +1,7 @@
 use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
 pub struct Block {
-    exprs: Vec<Expr>,
+    exprs: Vec<Expression>,
 }
 impl Block {
     fn new(s: &str) -> Result<Self, Error> {

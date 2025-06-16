@@ -2,11 +2,11 @@ mod binding_def;
 mod block;
 mod environment;
 mod error;
-mod expr;
+mod expression;
 mod identifier;
 mod number;
-mod op;
 mod operation;
+mod operator;
 mod statement;
 mod trimmed_string;
 mod value;
@@ -20,11 +20,11 @@ mod internal {
             error::{
                 BindingDefError, Error, ExprError, IdentifierError, OperatorError, StatementError,
             },
-            expr::Expr,
+            expression::Expression,
             identifier::Identifier,
             number::Number,
-            op::Op,
             operation::Operation,
+            operator::Operator,
             statement::Statement,
             trimmed_string::TrimmedString,
             value::Value,

@@ -1,10 +1,10 @@
 use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
-pub enum Expr {
+pub enum Expression {
     Number(Number),
     Operation(Operation),
 }
-impl Expr {
+impl Expression {
     pub fn new(s: &str) -> Result<Self, ExprError> {
         if let Ok(op) = Operation::new(s) {
             return Ok(Self::Operation(op));
@@ -28,37 +28,37 @@ mod tests {
     #[test]
     fn parse_operation() {
         assert_eq!(
-            Expr::new("1+2"),
-            Ok(Expr::Operation(Operation::new("1+2").unwrap()))
+            Expression::new("1+2"),
+            Ok(Expression::Operation(Operation::new("1+2").unwrap()))
         );
     }
     #[test]
     fn parse_number() {
         assert_eq!(
-            Expr::new("114"),
-            Ok(Expr::Number(Number::new(&"114".into()).unwrap()))
+            Expression::new("114"),
+            Ok(Expression::Number(Number::new(&"114".into()).unwrap()))
         );
     }
     #[test]
     fn parse_invalid_expr() {
-        assert_eq!(Expr::new("++"), Err(ExprError::InvalidExpr));
-        assert_eq!(Expr::new("1+"), Err(ExprError::InvalidExpr));
+        assert_eq!(Expression::new("++"), Err(ExprError::InvalidExpr));
+        assert_eq!(Expression::new("1+"), Err(ExprError::InvalidExpr));
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(Expr::new(""), Err(ExprError::InvalidExpr));
+        assert_eq!(Expression::new(""), Err(ExprError::InvalidExpr));
     }
     #[test]
     fn eval_operation() {
         assert_eq!(
-            Expr::new("114+514").unwrap().eval(),
+            Expression::new("114+514").unwrap().eval(),
             Value::Number(Number::from_i32(114 + 514))
         );
     }
     #[test]
     fn eval_number() {
         assert_eq!(
-            Expr::new("114").unwrap().eval(),
+            Expression::new("114").unwrap().eval(),
             Value::Number(Number::from_i32(114))
         );
     }

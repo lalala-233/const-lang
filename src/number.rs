@@ -2,7 +2,7 @@ use crate::internal::prelude::*;
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub struct Number(i32);
 impl Number {
-    pub fn new(s: &TrimmedString) -> Result<Self, NumberError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, NumberError> {
         Ok(Self(s.parse()?))
     }
     pub const fn inner(self) -> i32 {

@@ -14,9 +14,18 @@ mod value;
 mod internal {
     pub mod prelude {
         pub use crate::{
-            binding_def::BindingDef, block::Block, environment::Environment, error::*,
-            expression::Expression, identifier::Identifier, number::Number, operation::Operation,
-            operator::Operator, statement::Statement, trimmed_string::TrimmedString, value::Value,
+            binding_def::BindingDef,
+            block::Block,
+            environment::Environment,
+            error::*,
+            expression::Expression,
+            identifier::Identifier,
+            number::Number,
+            operation::Operation,
+            operator::Operator,
+            statement::Statement,
+            trimmed_string::{TrimmedStr, TrimmedString},
+            value::Value,
         };
     }
 }

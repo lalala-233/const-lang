@@ -4,7 +4,7 @@ use crate::internal::prelude::*;
 pub struct Identifier(TrimmedString);
 
 impl Identifier {
-    pub fn new(s: TrimmedString) -> Result<Self, IdentifierError> {
+    pub fn new(s: TrimmedStr) -> Result<Self, IdentifierError> {
         if !s.starts_with(char::is_alphabetic) {
             return Err(IdentifierError::StartWithNonLetter);
         }
@@ -12,7 +12,7 @@ impl Identifier {
             return Err(IdentifierError::ContainWhitespace);
         }
         // TODO: more checks like ops, keywords, etc.
-        Ok(Self(s))
+        Ok(Self(s.into()))
     }
 }
 

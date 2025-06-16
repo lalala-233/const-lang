@@ -20,6 +20,10 @@ pub enum BindingDefError {
     MissingLetKeyword,
     #[error("Expect `=` here")]
     MissingEqualsSign,
+    #[error(transparent)]
+    Expr(#[from] ExprError),
+    #[error(transparent)]
+    Identifier(#[from] IdentifierError),
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperatorError {
@@ -38,3 +42,5 @@ pub enum ExprError {
     #[error("Invalid expression")]
     InvalidExpr,
 }
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum StatementError {}

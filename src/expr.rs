@@ -5,7 +5,7 @@ pub enum Expr {
     Operation(Operation),
 }
 impl Expr {
-    fn new(s: &str) -> Result<Self, ExprError> {
+    pub fn new(s: &str) -> Result<Self, ExprError> {
         if let Ok(op) = Operation::new(s) {
             return Ok(Self::Operation(op));
         }

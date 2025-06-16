@@ -3,7 +3,7 @@ use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
 pub struct BindingDef {
     name: Identifier,
-    val: Expr,
+    val: Operation,
 }
 
 impl BindingDef {
@@ -13,7 +13,7 @@ impl BindingDef {
 
         Self {
             name: Identifier::new(identifier.into()),
-            val: Expr::new(expr),
+            val: Operation::new(expr),
         }
     }
 }
@@ -27,7 +27,7 @@ mod tests {
             BindingDef::new("let foo = 1 + 1"),
             BindingDef {
                 name: Identifier::new("foo".into()),
-                val: Expr::new("1+1")
+                val: Operation::new("1+1")
             }
         );
     }

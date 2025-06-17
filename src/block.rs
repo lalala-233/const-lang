@@ -50,4 +50,22 @@ mod tests {
             })
         );
     }
+    #[test]
+    fn parse_block_with_multiple_statements() {
+        assert_eq!(
+            Block::new(
+                &"{ let a = 11451;
+        let b = a;
+        b}"
+                .into()
+            ),
+            Ok(Block {
+                statements: vec![
+                    Statement::BindingDef(BindingDef::new(&"let a = 11451;".into()).unwrap()),
+                    Statement::BindingDef(BindingDef::new(&"let b = a;".into()).unwrap()),
+                    Statement::Expression(Expression::Binding(Binding::new(&"b".into()).unwrap()))
+                ]
+            })
+        );
+    }
 }

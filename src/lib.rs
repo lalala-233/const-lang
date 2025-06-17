@@ -1,3 +1,4 @@
+mod binding;
 mod binding_def;
 mod block;
 mod environment;
@@ -14,6 +15,7 @@ mod value;
 mod internal {
     pub mod prelude {
         pub use crate::{
+            binding::Binding,
             binding_def::BindingDef,
             block::Block,
             environment::Environment,

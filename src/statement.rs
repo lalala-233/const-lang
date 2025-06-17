@@ -23,9 +23,9 @@ mod tests {
     #[test]
     fn parse_binding_def() {
         assert_eq!(
-            Statement::new(&"let x = 5".into()),
+            Statement::new(&"let x = 5;".into()),
             Ok(Statement::BindingDef(
-                BindingDef::new(&"let x = 5".into()).unwrap()
+                BindingDef::new(&"let x = 5;".into()).unwrap()
             ))
         );
     }

@@ -24,14 +24,14 @@ impl<'a> From<&'a str> for TrimmedStr<'a> {
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct TrimmedString(String);
-impl From<TrimmedStr<'_>> for TrimmedString {
-    fn from(value: TrimmedStr<'_>) -> Self {
+impl From<&TrimmedStr<'_>> for TrimmedString {
+    fn from(value: &TrimmedStr<'_>) -> Self {
         Self(value.to_string())
     }
 }
 impl From<&str> for TrimmedString {
     fn from(value: &str) -> Self {
-        let trimmed_str = TrimmedStr::new(value);
+        let trimmed_str = &TrimmedStr::new(value);
         trimmed_str.into()
     }
 }

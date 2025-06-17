@@ -7,6 +7,8 @@ pub enum Error {}
 pub enum BindingDefError {
     #[error("Expect `let` here")]
     MissingLetKeyword,
+    #[error("Expect `;` here")]
+    MissingSemicolon,
     #[error("Expect `=` here")]
     MissingEqualsSign,
     #[error(transparent)]
@@ -25,6 +27,8 @@ pub enum IdentifierError {
     StartWithNonLetter,
     #[error("Identifier must not contain whitespace")]
     ContainWhitespace,
+    #[error("Identifier must not be empty")]
+    Empty,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum ExpressionError {
@@ -49,4 +53,9 @@ pub enum OperationError {
 pub enum NumberError {
     #[error("Invalid number")]
     InvalidNumber(#[from] ParseIntError),
+}
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum BindingError {
+    #[error(transparent)]
+    Identifier(#[from] IdentifierError),
 }

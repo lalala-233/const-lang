@@ -10,13 +10,15 @@ impl BindingDef {
     pub fn new(s: &TrimmedStr) -> Result<Self, BindingDefError> {
         let s = s
             .strip_prefix("let ")
-            .ok_or(BindingDefError::MissingLetKeyword)?;
+            .ok_or(BindingDefError::MissingLetKeyword)?
+            .strip_suffix(';')
+            .ok_or(BindingDefError::MissingSemicolon)?;
         let (identifier, expr) = s
             .split_once('=')
             .ok_or(BindingDefError::MissingEqualsSign)?;
 
         Ok(Self {
-            name: Identifier::new(identifier.into())?,
+            name: Identifier::new(&identifier.into())?,
             val: Expression::new(&expr.into())?,
         })
     }
@@ -28,9 +30,9 @@ mod tests {
     #[test]
     fn parse_binding_def_with_expr() {
         assert_eq!(
-            BindingDef::new(&"let foo = 1 + 1".into()),
+            BindingDef::new(&"let foo = 1 + 1;".into()),
             Ok(BindingDef {
-                name: Identifier::new("foo".into()).unwrap(),
+                name: Identifier::new(&"foo".into()).unwrap(),
                 val: Expression::new(&"1+1".into()).unwrap()
             })
         );
@@ -38,9 +40,9 @@ mod tests {
     #[test]
     fn parse_binding_def_with_value() {
         assert_eq!(
-            BindingDef::new(&"let foo = 3".into()),
+            BindingDef::new(&"let foo = 3;".into()),
             Ok(BindingDef {
-                name: Identifier::new("foo".into()).unwrap(),
+                name: Identifier::new(&"foo".into()).unwrap(),
                 val: Expression::Number(Number::from_i32(3))
             })
         );
@@ -48,7 +50,7 @@ mod tests {
     #[test]
     fn parse_without_equal() {
         assert_eq!(
-            BindingDef::new(&"let foo 1+1".into()),
+            BindingDef::new(&"let foo 1+1;".into()),
             Err(BindingDefError::MissingEqualsSign)
         );
     }
@@ -64,6 +66,13 @@ mod tests {
         assert_eq!(
             BindingDef::new(&"letdown=1+1".into()),
             Err(BindingDefError::MissingLetKeyword)
+        );
+    }
+    #[test]
+    fn parse_without_semicolon() {
+        assert_eq!(
+            BindingDef::new(&"let foo = 1+1".into()),
+            Err(BindingDefError::MissingSemicolon)
         );
     }
 }

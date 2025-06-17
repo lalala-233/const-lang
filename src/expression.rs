@@ -3,6 +3,7 @@ use crate::internal::prelude::*;
 pub enum Expression {
     Number(Number),
     Operation(Operation),
+    Binding(Binding),
     Empty,
 }
 impl Expression {
@@ -12,6 +13,9 @@ impl Expression {
         }
         if let Ok(number) = Number::new(s) {
             return Ok(Self::Number(number));
+        }
+        if let Ok(binding) = Binding::new(s) {
+            return Ok(Self::Binding(binding));
         }
         if s.is_empty() {
             return Ok(Self::Empty);
@@ -23,6 +27,7 @@ impl Expression {
             Self::Number(number) => Value::Number(*number),
             Self::Operation(operation) => operation.eval(),
             Self::Empty => Value::Empty,
+            Self::Binding(binding) => todo!(),
         }
     }
 }

@@ -3,6 +3,7 @@ use crate::internal::prelude::*;
 pub enum Expression {
     Number(Number),
     Operation(Operation),
+    Empty,
 }
 impl Expression {
     pub fn new(s: &TrimmedStr) -> Result<Self, ExpressionError> {
@@ -12,12 +13,16 @@ impl Expression {
         if let Ok(number) = Number::new(s) {
             return Ok(Self::Number(number));
         }
+        if s.is_empty() {
+            return Ok(Self::Empty);
+        }
         Err(ExpressionError::InvalidExpression)
     }
     const fn eval(&self) -> Value {
         match self {
             Self::Number(number) => Value::Number(*number),
             Self::Operation(operation) => operation.eval(),
+            Self::Empty => Value::Empty,
         }
     }
 }
@@ -38,7 +43,7 @@ mod tests {
     fn parse_number() {
         assert_eq!(
             Expression::new(&"114".into()),
-            Ok(Expression::Number(Number::new(&"114".into()).unwrap()))
+            Ok(Expression::Number(Number::from_i32(114)))
         );
     }
     #[test]
@@ -54,10 +59,7 @@ mod tests {
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(
-            Expression::new(&"".into()),
-            Err(ExpressionError::InvalidExpression)
-        );
+        assert_eq!(Expression::new(&"".into()), Ok(Expression::Empty));
     }
     #[test]
     fn eval_operation() {

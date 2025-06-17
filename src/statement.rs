@@ -2,7 +2,7 @@ use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
 pub enum Statement {
     BindingDef(BindingDef),
-    Expr(Expression),
+    Expression(Expression),
 }
 
 impl Statement {
@@ -11,7 +11,7 @@ impl Statement {
             return Ok(Self::BindingDef(binding_def));
         }
         if let Ok(expr) = Expression::new(s) {
-            return Ok(Self::Expr(expr));
+            return Ok(Self::Expression(expr));
         }
         Err(StatementError::InvalidStatement)
     }
@@ -24,14 +24,18 @@ mod tests {
     fn parse_binding_def() {
         assert_eq!(
             Statement::new(&"let x = 5".into()),
-            Ok(Statement::BindingDef(BindingDef::new(&"let x = 5".into()).unwrap()))
+            Ok(Statement::BindingDef(
+                BindingDef::new(&"let x = 5".into()).unwrap()
+            ))
         );
     }
     #[test]
     fn parse_expr() {
         assert_eq!(
             Statement::new(&"114+514".into()),
-            Ok(Statement::Expr(Expression::new(&"114+514".into()).unwrap()))
+            Ok(Statement::Expression(
+                Expression::new(&"114+514".into()).unwrap()
+            ))
         );
     }
     #[test]
@@ -43,6 +47,9 @@ mod tests {
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(Statement::new(&"".into()), Err(StatementError::InvalidStatement));
+        assert_eq!(
+            Statement::new(&"".into()),
+            Ok(Statement::Expression(Expression::Empty))
+        );
     }
 }

@@ -41,7 +41,7 @@ mod tests {
             BindingDef::new(&"let foo = 3".into()),
             Ok(BindingDef {
                 name: Identifier::new("foo".into()).unwrap(),
-                val: Expression::new(&"3".into()).unwrap()
+                val: Expression::Number(Number::from_i32(3))
             })
         );
     }

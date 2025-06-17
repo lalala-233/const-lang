@@ -61,28 +61,28 @@ mod tests {
     fn eval_add() {
         assert_eq!(
             Operation::new(&"1+2".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(3))
+            Value::Number(Number::from_i32(1+2))
         );
     }
     #[test]
     fn eval_sub() {
         assert_eq!(
             Operation::new(&"15-2".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(13))
+            Value::Number(Number::from_i32(15-2))
         );
     }
     #[test]
     fn eval_mul() {
         assert_eq!(
             Operation::new(&"12*12".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(144))
+            Value::Number(Number::from_i32(12*12))
         );
     }
     #[test]
     fn eval_div() {
         assert_eq!(
             Operation::new(&"9/3".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(3))
+            Value::Number(Number::from_i32(9/3))
         );
     }
 }

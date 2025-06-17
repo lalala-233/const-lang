@@ -59,3 +59,12 @@ pub enum BindingError {
     #[error(transparent)]
     Identifier(#[from] IdentifierError),
 }
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum BlockError {
+    #[error("Missing opening brace `{{`")]
+    MissingOpeningBrace,
+    #[error("Missing closing brace `}}`")]
+    MissingClosingBrace,
+    #[error(transparent)]
+    Statement(#[from] StatementError),
+}

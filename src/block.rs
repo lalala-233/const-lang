@@ -4,18 +4,19 @@ pub struct Block {
     statements: Vec<Statement>,
 }
 impl Block {
-    fn new(s: &TrimmedStr) -> Result<Self, StatementError> {
-        if let Some(s) = s.strip_prefix('{') {
-            if let Some(s) = s.strip_suffix('}') {
-                let statements = s
-                    .trim()
-                    .lines()
-                    .map(|s| Statement::new(&s.into()))
-                    .collect::<Result<_, _>>()?;
-                return Ok(Self { statements });
-            }
-        }
-        Err(StatementError::InvalidStatement)
+    fn new(s: &TrimmedStr) -> Result<Self, BlockError> {
+        let Some(s) = s.strip_prefix('{') else {
+            return Err(BlockError::MissingOpeningBrace);
+        };
+        let Some(s) = s.strip_suffix('}') else {
+            return Err(BlockError::MissingClosingBrace);
+        };
+        let statements = s
+            .trim()
+            .split_inclusive(';')
+            .map(|s| Statement::new(&s.into()))
+            .collect::<Result<_, _>>()?;
+        Ok(Self { statements })
     }
 }
 #[cfg(test)]
@@ -51,6 +52,17 @@ mod tests {
         );
     }
     #[test]
+    fn parse_block_with_one_expr() {
+        assert_eq!(
+            Block::new(&"{ a }".into()),
+            Ok(Block {
+                statements: vec![Statement::Expression(Expression::Binding(
+                    Binding::new(&"a".into()).unwrap()
+                ))]
+            })
+        );
+    }
+    #[test]
     fn parse_block_with_multiple_statements() {
         assert_eq!(
             Block::new(
@@ -66,6 +78,34 @@ mod tests {
                     Statement::Expression(Expression::Binding(Binding::new(&"b".into()).unwrap()))
                 ]
             })
+        );
+    }
+    #[test]
+    fn parse_block_with_one_line_but_multiple_statements() {
+        assert_eq!(
+            Block::new(&"{let a = 1;a}".into()),
+            Ok(Block {
+                statements: vec![
+                    Statement::BindingDef(BindingDef::new(&"let a = 1;".into()).unwrap()),
+                    Statement::Expression(Expression::Binding(Binding::new(&"a".into()).unwrap()))
+                ]
+            })
+        );
+    }
+    #[test]
+    fn parse_without_braces() {
+        assert_eq!(
+            Block::new(&"{let a = 11451;".into()),
+            Err(BlockError::MissingClosingBrace)
+        );
+        assert_eq!(
+            Block::new(&"let a = 11451;}".into()),
+            Err(BlockError::MissingOpeningBrace)
+        );
+        assert_eq!(Block::new(&"".into()), Err(BlockError::MissingOpeningBrace));
+        assert_eq!(
+            Block::new(&"{let a = 11451}".into()),
+            Err(BlockError::Statement(StatementError::InvalidStatement))
         );
     }
 }

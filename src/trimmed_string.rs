@@ -9,11 +9,11 @@ impl<'a> TrimmedStr<'a> {
         Self(s)
     }
 }
-impl<'a> Deref for TrimmedStr<'a> {
+impl Deref for TrimmedStr<'_> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        self.0
     }
 }
 impl<'a> From<&'a str> for TrimmedStr<'a> {
@@ -22,7 +22,7 @@ impl<'a> From<&'a str> for TrimmedStr<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct TrimmedString(String);
 impl From<&TrimmedStr<'_>> for TrimmedString {
     fn from(value: &TrimmedStr<'_>) -> Self {

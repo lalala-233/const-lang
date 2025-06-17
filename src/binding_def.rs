@@ -3,7 +3,7 @@ use crate::internal::prelude::*;
 #[derive(Debug, PartialEq, Eq)]
 pub struct BindingDef {
     name: Identifier,
-    val: Expression,
+    expr: Expression,
 }
 
 impl BindingDef {
@@ -19,8 +19,17 @@ impl BindingDef {
 
         Ok(Self {
             name: Identifier::new(&identifier.into())?,
-            val: Expression::new(&expr.into())?,
+            expr: Expression::new(&expr.into())?,
         })
+    }
+    pub const fn name(&self) -> &Identifier {
+        &self.name
+    }
+    pub const fn expr(&self) -> &Expression {
+        &self.expr
+    }
+    pub fn store(&self, env: &mut Environment) {
+        env.insert(self.name.clone(), self.expr.clone());
     }
 }
 
@@ -33,7 +42,7 @@ mod tests {
             BindingDef::new(&"let foo = 1 + 1;".into()),
             Ok(BindingDef {
                 name: Identifier::new(&"foo".into()).unwrap(),
-                val: Expression::new(&"1+1".into()).unwrap()
+                expr: Expression::new(&"1+1".into()).unwrap()
             })
         );
     }
@@ -43,7 +52,7 @@ mod tests {
             BindingDef::new(&"let foo = 3;".into()),
             Ok(BindingDef {
                 name: Identifier::new(&"foo".into()).unwrap(),
-                val: Expression::Number(Number::from_i32(3))
+                expr: Expression::Number(Number::from_i32(3))
             })
         );
     }

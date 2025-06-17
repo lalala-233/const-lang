@@ -1,5 +1,5 @@
 use crate::internal::prelude::*;
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Expression {
     Number(Number),
     Operation(Operation),
@@ -22,12 +22,12 @@ impl Expression {
         }
         Err(ExpressionError::InvalidExpression)
     }
-    const fn eval(&self) -> Value {
+    fn eval(&self, env: &Environment) -> Result<Value, ExpressionError> {
         match self {
-            Self::Number(number) => Value::Number(*number),
-            Self::Operation(operation) => operation.eval(),
-            Self::Empty => Value::Empty,
-            Self::Binding(binding) => todo!(),
+            Self::Number(number) => Ok(Value::Number(*number)),
+            Self::Operation(operation) => Ok(operation.eval()),
+            Self::Empty => Ok(Value::Empty),
+            Self::Binding(binding) => binding.get_from(env).map(|expr| expr.eval(env))?,
         }
     }
 }
@@ -67,17 +67,53 @@ mod tests {
         assert_eq!(Expression::new(&"".into()), Ok(Expression::Empty));
     }
     #[test]
+    fn parse_binding() {
+        assert_eq!(
+            Expression::new(&"something".into()),
+            Ok(Expression::Binding(
+                Binding::new(&"something".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
     fn eval_operation() {
         assert_eq!(
-            Expression::new(&"114+514".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(114 + 514))
+            Expression::Operation(Operation::new(&"114+514".into()).unwrap())
+                .eval(&Environment::default()),
+            Ok(Value::Number(Number::from_i32(114 + 514)))
         );
     }
     #[test]
     fn eval_number() {
         assert_eq!(
-            Expression::new(&"114".into()).unwrap().eval(),
-            Value::Number(Number::from_i32(114))
+            Expression::Number(Number::from_i32(114)).eval(&Environment::default()),
+            Ok(Value::Number(Number::from_i32(114)))
+        );
+    }
+    #[test]
+    fn eval_empty() {
+        assert_eq!(
+            Expression::Empty.eval(&Environment::default()),
+            Ok(Value::Empty)
+        );
+    }
+    #[test]
+    fn eval_existing_binding() {
+        let mut env = Environment::default();
+        BindingDef::new(&"let a = 114;".into())
+            .unwrap()
+            .store(&mut env);
+        assert_eq!(
+            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
+            Ok(Value::Number(Number::from_i32(114)))
+        );
+    }
+    #[test]
+    fn eval_non_existing_binding() {
+        let env = Environment::default();
+        assert_eq!(
+            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
+            Err(ExpressionError::Binding(BindingError::NotFound))
         );
     }
 }

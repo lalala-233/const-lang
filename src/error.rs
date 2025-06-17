@@ -34,6 +34,8 @@ pub enum IdentifierError {
 pub enum ExpressionError {
     #[error("Invalid expression")]
     InvalidExpression,
+    #[error(transparent)]
+    Binding(#[from] BindingError),
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum StatementError {
@@ -58,6 +60,8 @@ pub enum NumberError {
 pub enum BindingError {
     #[error(transparent)]
     Identifier(#[from] IdentifierError),
+    #[error("Binding is not found")]
+    NotFound,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BlockError {

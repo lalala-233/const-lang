@@ -1,10 +1,10 @@
 use crate::internal::prelude::*;
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Block {
     statements: Vec<Statement>,
 }
 impl Block {
-    fn new(s: &TrimmedStr) -> Result<Self, BlockError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, BlockError> {
         let Some(s) = s.strip_prefix('{') else {
             return Err(BlockError::MissingOpeningBrace);
         };

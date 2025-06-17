@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::internal::prelude::*;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
@@ -18,7 +20,18 @@ impl Identifier {
         Ok(Self(s.into()))
     }
 }
-
+impl FromStr for Identifier {
+    type Err = IdentifierError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new(&s.into())
+    }
+}
+impl TryFrom<&str> for Identifier {
+    type Error = IdentifierError;
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        Self::new(&s.into())
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;

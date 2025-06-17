@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct BindingDef {
     name: Identifier,
     expr: Expression,

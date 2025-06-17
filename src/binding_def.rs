@@ -7,7 +7,7 @@ pub struct BindingDef {
 }
 
 impl BindingDef {
-    pub fn new(s: &TrimmedStr) -> Result<Self, BindingDefError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, Error> {
         let s = s
             .strip_prefix("let ")
             .ok_or(BindingDefError::MissingLetKeyword)?
@@ -60,28 +60,28 @@ mod tests {
     fn parse_without_equal() {
         assert_eq!(
             BindingDef::new(&"let foo 1+1;".into()),
-            Err(BindingDefError::MissingEqualsSign)
+            Err(Error::BindingDef(BindingDefError::MissingEqualsSign))
         );
     }
     #[test]
     fn parse_without_let() {
         assert_eq!(
             BindingDef::new(&"good morning".into()),
-            Err(BindingDefError::MissingLetKeyword)
+            Err(Error::BindingDef(BindingDefError::MissingLetKeyword))
         );
     }
     #[test]
     fn parse_invalid_binding_def() {
         assert_eq!(
             BindingDef::new(&"letdown=1+1".into()),
-            Err(BindingDefError::MissingLetKeyword)
+            Err(Error::BindingDef(BindingDefError::MissingLetKeyword))
         );
     }
     #[test]
     fn parse_without_semicolon() {
         assert_eq!(
             BindingDef::new(&"let foo = 1+1".into()),
-            Err(BindingDefError::MissingSemicolon)
+            Err(Error::BindingDef(BindingDefError::MissingSemicolon))
         );
     }
 }

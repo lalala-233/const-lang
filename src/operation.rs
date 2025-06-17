@@ -7,7 +7,7 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn new(s: &TrimmedStr) -> Result<Self, OperationError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self,Error> {
         // find and parse is not the best, but it's simple
         let nth = s
             .find(Operator::OP_CHAR_LIST)

@@ -2,7 +2,26 @@ use std::num::ParseIntError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq, Eq)]
-pub enum Error {}
+pub enum Error {
+    #[error(transparent)]
+    Statement(#[from] StatementError),
+    #[error(transparent)]
+    Expression(#[from] ExpressionError),
+    #[error(transparent)]
+    Identifier(#[from] IdentifierError),
+    #[error(transparent)]
+    Binding(#[from] BindingError),
+    #[error(transparent)]
+    Number(#[from] NumberError),
+    #[error(transparent)]
+    Operator(#[from] OperatorError),
+    #[error(transparent)]
+    Operation(#[from] OperationError),
+    #[error(transparent)]
+    BindingDef(#[from] BindingDefError),
+    #[error(transparent)]
+    Block(#[from] BlockError),
+}
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BindingDefError {
     #[error("Expect `let` here")]
@@ -11,10 +30,6 @@ pub enum BindingDefError {
     MissingSemicolon,
     #[error("Expect `=` here")]
     MissingEqualsSign,
-    #[error(transparent)]
-    Expression(#[from] ExpressionError),
-    #[error(transparent)]
-    Identifier(#[from] IdentifierError),
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperatorError {
@@ -34,8 +49,6 @@ pub enum IdentifierError {
 pub enum ExpressionError {
     #[error("Invalid expression")]
     InvalidExpression,
-    #[error(transparent)]
-    Binding(#[from] BindingError),
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum StatementError {
@@ -44,12 +57,8 @@ pub enum StatementError {
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperationError {
-    #[error(transparent)]
-    Number(#[from] NumberError),
     #[error("Operator is not found")]
     OperatorNotFound,
-    #[error(transparent)]
-    Operator(#[from] OperatorError),
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NumberError {
@@ -58,10 +67,8 @@ pub enum NumberError {
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BindingError {
-    #[error(transparent)]
-    Identifier(#[from] IdentifierError),
     #[error("Binding is not found")]
-    NotFound,
+    BindingNotFound,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BlockError {
@@ -69,6 +76,4 @@ pub enum BlockError {
     MissingOpeningBrace,
     #[error("Missing closing brace `}}`")]
     MissingClosingBrace,
-    #[error(transparent)]
-    Statement(#[from] StatementError),
 }

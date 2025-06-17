@@ -5,25 +5,23 @@ pub struct Binding {
     name: Identifier,
 }
 impl Binding {
-    pub fn new(name: &TrimmedStr) -> Result<Self, BindingError> {
+    pub fn new(name: &TrimmedStr) -> Result<Self, Error> {
         let name = Identifier::new(name)?;
         Ok(Self { name })
     }
     pub fn get_from(&self, env: &Environment) -> Result<Expression, BindingError> {
-        env.get(&self.name).ok_or(BindingError::NotFound)
+        env.get(&self.name).ok_or(BindingError::BindingNotFound)
     }
 }
 #[cfg(test)]
 mod tests {
-    use std::f32::consts::E;
-
     use super::*;
     #[test]
     fn parse_binding() {
         assert_eq!(
             Binding::new(&"foo".into()),
             Ok(Binding {
-                name: Identifier::new(&"foo".into()).unwrap()
+                name: "foo".try_into().unwrap()
             })
         );
     }
@@ -31,16 +29,14 @@ mod tests {
     fn parse_binding_error() {
         assert!(matches!(
             Binding::new(&"114514abc".into()),
-            Err(BindingError::Identifier(
-                IdentifierError::StartWithNonLetter
-            ))
+            Err(Error::Identifier(IdentifierError::StartWithNonLetter))
         ));
     }
     #[test]
     fn parse_empty() {
         assert!(matches!(
             Binding::new(&"".into()),
-            Err(BindingError::Identifier(IdentifierError::Empty))
+            Err(Error::Identifier(IdentifierError::Empty))
         ));
     }
     #[test]
@@ -59,7 +55,7 @@ mod tests {
         let env = Environment::default();
         assert_eq!(
             Binding::new(&"foo".into()).unwrap().get_from(&env),
-            Err(BindingError::NotFound)
+            Err(BindingError::BindingNotFound)
         );
     }
 }

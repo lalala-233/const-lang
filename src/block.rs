@@ -4,12 +4,12 @@ pub struct Block {
     statements: Vec<Statement>,
 }
 impl Block {
-    pub fn new(s: &TrimmedStr) -> Result<Self, BlockError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, Error> {
         let Some(s) = s.strip_prefix('{') else {
-            return Err(BlockError::MissingOpeningBrace);
+            return Err(BlockError::MissingOpeningBrace)?;
         };
         let Some(s) = s.strip_suffix('}') else {
-            return Err(BlockError::MissingClosingBrace);
+            return Err(BlockError::MissingClosingBrace)?;
         };
         let statements = s
             .trim()
@@ -96,16 +96,19 @@ mod tests {
     fn parse_without_braces() {
         assert_eq!(
             Block::new(&"{let a = 11451;".into()),
-            Err(BlockError::MissingClosingBrace)
+            Err(Error::Block(BlockError::MissingClosingBrace))
         );
         assert_eq!(
             Block::new(&"let a = 11451;}".into()),
-            Err(BlockError::MissingOpeningBrace)
+            Err(Error::Block(BlockError::MissingOpeningBrace))
         );
-        assert_eq!(Block::new(&"".into()), Err(BlockError::MissingOpeningBrace));
+        assert_eq!(
+            Block::new(&"".into()),
+            Err(Error::Block(BlockError::MissingOpeningBrace))
+        );
         assert_eq!(
             Block::new(&"{let a = 11451}".into()),
-            Err(BlockError::Statement(StatementError::InvalidStatement))
+            Err(Error::Statement(StatementError::InvalidStatement))
         );
     }
 }

@@ -22,7 +22,7 @@ impl Expression {
         }
         Err(ExpressionError::InvalidExpression)
     }
-    fn eval(&self, env: &Environment) -> Result<Value, ExpressionError> {
+    fn eval(&self, env: &Environment) -> Result<Value, Error> {
         match self {
             Self::Number(number) => Ok(Value::Number(*number)),
             Self::Operation(operation) => Ok(operation.eval()),
@@ -113,7 +113,7 @@ mod tests {
         let env = Environment::default();
         assert_eq!(
             Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
-            Err(ExpressionError::Binding(BindingError::NotFound))
+            Err(Error::Binding(BindingError::BindingNotFound))
         );
     }
 }

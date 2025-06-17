@@ -6,7 +6,7 @@ pub enum Statement {
 }
 
 impl Statement {
-    pub fn new(s: &str) -> Result<Self, StatementError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, StatementError> {
         if let Ok(binding_def) = BindingDef::new(s) {
             return Ok(Self::BindingDef(binding_def));
         }
@@ -23,26 +23,26 @@ mod tests {
     #[test]
     fn parse_binding_def() {
         assert_eq!(
-            Statement::new("let x = 5"),
-            Ok(Statement::BindingDef(BindingDef::new("let x = 5").unwrap()))
+            Statement::new(&"let x = 5".into()),
+            Ok(Statement::BindingDef(BindingDef::new(&"let x = 5".into()).unwrap()))
         );
     }
     #[test]
     fn parse_expr() {
         assert_eq!(
-            Statement::new("114+514"),
-            Ok(Statement::Expr(Expression::new("114+514").unwrap()))
+            Statement::new(&"114+514".into()),
+            Ok(Statement::Expr(Expression::new(&"114+514".into()).unwrap()))
         );
     }
     #[test]
     fn parse_invalid() {
         assert_eq!(
-            Statement::new("let a=a=1"),
+            Statement::new(&"let a=a=1".into()),
             Err(StatementError::InvalidStatement)
         );
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(Statement::new(""), Err(StatementError::InvalidStatement));
+        assert_eq!(Statement::new(&"".into()), Err(StatementError::InvalidStatement));
     }
 }

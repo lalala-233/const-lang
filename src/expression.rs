@@ -5,11 +5,11 @@ pub enum Expression {
     Operation(Operation),
 }
 impl Expression {
-    pub fn new(s: &str) -> Result<Self, ExpressionError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, ExpressionError> {
         if let Ok(op) = Operation::new(s) {
             return Ok(Self::Operation(op));
         }
-        if let Ok(number) = Number::new(&s.into()) {
+        if let Ok(number) = Number::new(s) {
             return Ok(Self::Number(number));
         }
         Err(ExpressionError::InvalidExpression)
@@ -28,43 +28,48 @@ mod tests {
     #[test]
     fn parse_operation() {
         assert_eq!(
-            Expression::new("1+2"),
-            Ok(Expression::Operation(Operation::new("1+2").unwrap()))
+            Expression::new(&"1+2".into()),
+            Ok(Expression::Operation(
+                Operation::new(&"1+2".into()).unwrap()
+            ))
         );
     }
     #[test]
     fn parse_number() {
         assert_eq!(
-            Expression::new("114"),
+            Expression::new(&"114".into()),
             Ok(Expression::Number(Number::new(&"114".into()).unwrap()))
         );
     }
     #[test]
     fn parse_invalid_expr() {
         assert_eq!(
-            Expression::new("++"),
+            Expression::new(&"++".into()),
             Err(ExpressionError::InvalidExpression)
         );
         assert_eq!(
-            Expression::new("1+"),
+            Expression::new(&"1+".into()),
             Err(ExpressionError::InvalidExpression)
         );
     }
     #[test]
     fn parse_empty() {
-        assert_eq!(Expression::new(""), Err(ExpressionError::InvalidExpression));
+        assert_eq!(
+            Expression::new(&"".into()),
+            Err(ExpressionError::InvalidExpression)
+        );
     }
     #[test]
     fn eval_operation() {
         assert_eq!(
-            Expression::new("114+514").unwrap().eval(),
+            Expression::new(&"114+514".into()).unwrap().eval(),
             Value::Number(Number::from_i32(114 + 514))
         );
     }
     #[test]
     fn eval_number() {
         assert_eq!(
-            Expression::new("114").unwrap().eval(),
+            Expression::new(&"114".into()).unwrap().eval(),
             Value::Number(Number::from_i32(114))
         );
     }

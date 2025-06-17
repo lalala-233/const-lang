@@ -7,7 +7,7 @@ pub struct Operation {
 }
 
 impl Operation {
-    pub fn new(s: &str) -> Result<Self, OperationError> {
+    pub fn new(s: &TrimmedStr) -> Result<Self, OperationError> {
         // find and parse is not the best, but it's simple
         let nth = s
             .find(Operator::OP_CHAR_LIST)
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn parse_one_add_two() {
         assert_eq!(
-            Operation::new("1+2"),
+            Operation::new(&"1+2".into()),
             Ok(Operation {
                 lhs: Number::new(&"1".into()).unwrap(),
                 rhs: Number::new(&"2".into()).unwrap(),
@@ -49,7 +49,7 @@ mod tests {
     #[test]
     fn parse_with_whitespace() {
         assert_eq!(
-            Operation::new(" 12 * 32 "),
+            Operation::new(&" 12 * 32 ".into()),
             Ok(Operation {
                 lhs: Number::new(&"12".into()).unwrap(),
                 rhs: Number::new(&"32".into()).unwrap(),
@@ -60,28 +60,28 @@ mod tests {
     #[test]
     fn eval_add() {
         assert_eq!(
-            Operation::new("1+2").unwrap().eval(),
+            Operation::new(&"1+2".into()).unwrap().eval(),
             Value::Number(Number::from_i32(3))
         );
     }
     #[test]
     fn eval_sub() {
         assert_eq!(
-            Operation::new("15-2").unwrap().eval(),
+            Operation::new(&"15-2".into()).unwrap().eval(),
             Value::Number(Number::from_i32(13))
         );
     }
     #[test]
     fn eval_mul() {
         assert_eq!(
-            Operation::new("12*12").unwrap().eval(),
+            Operation::new(&"12*12".into()).unwrap().eval(),
             Value::Number(Number::from_i32(144))
         );
     }
     #[test]
     fn eval_div() {
         assert_eq!(
-            Operation::new("9/3").unwrap().eval(),
+            Operation::new(&"9/3".into()).unwrap().eval(),
             Value::Number(Number::from_i32(3))
         );
     }

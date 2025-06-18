@@ -42,7 +42,7 @@ mod tests {
     #[test]
     fn eval_existing_binding() {
         let env = &mut Environment::default();
-        BindingDef::new(&"let foo = 11451;".into())
+        BindingDef::new(&"let foo = 11451".into())
             .unwrap()
             .store(env);
         assert_eq!(

@@ -19,17 +19,17 @@ mod tests {
     use super::*;
     #[test]
     fn multiple_insert() {
-        let mut env = Environment::default();
-        BindingDef::new(&"let x = 11451;".into())
+        let env = &mut Environment::default();
+        BindingDef::new(&"let x = 11451".into())
             .unwrap()
-            .store(&mut env);
+            .store(env);
         assert_eq!(
             env.bindings.get(&"x".try_into().unwrap()),
             Some(&Expression::Number(Number::from_i32(11451)))
         );
-        BindingDef::new(&"let x = 19198;".into())
+        BindingDef::new(&"let x = 19198".into())
             .unwrap()
-            .store(&mut env);
+            .store(env);
         assert_eq!(
             env.bindings.get(&"x".try_into().unwrap()),
             Some(&Expression::Number(Number::from_i32(19198)))

@@ -7,11 +7,18 @@ pub enum Statement {
 
 impl Statement {
     pub fn new(s: &TrimmedStr) -> Result<Self, StatementError> {
+        if let Ok(expr) = Expression::new(s) {
+            return Ok(Self::Expression(expr));
+        }
+        let s = &TrimmedStr::new(
+            s.strip_suffix(';')
+                .ok_or(StatementError::BindingDefMissingSemicolon)?,
+        );
         if let Ok(binding_def) = BindingDef::new(s) {
             return Ok(Self::BindingDef(binding_def));
         }
-        if let Ok(expr) = Expression::new(s) {
-            return Ok(Self::Expression(expr));
+        if Expression::new(s).is_ok() {
+            return Ok(Self::Expression(Expression::Empty));
         }
         Err(StatementError::InvalidStatement)
     }
@@ -34,7 +41,7 @@ mod tests {
         assert_eq!(
             Statement::new(&"let x = 5;".into()),
             Ok(Statement::BindingDef(
-                BindingDef::new(&"let x = 5;".into()).unwrap()
+                BindingDef::new(&"let x = 5".into()).unwrap()
             ))
         );
     }
@@ -42,16 +49,37 @@ mod tests {
     fn parse_expr() {
         assert_eq!(
             Statement::new(&"114+514".into()),
-            Ok(Statement::Expression(
-                Expression::new(&"114+514".into()).unwrap()
-            ))
+            Ok(Statement::Expression(Expression::Operation(
+                Operation::new(&"114+514".into()).unwrap()
+            )))
+        );
+        assert_eq!(
+            Statement::new(&"1919".into()),
+            Ok(Statement::Expression(Expression::Number(Number::from_i32(
+                1919
+            ))))
+        );
+    }
+    #[test]
+    fn parse_expression_with_semicolon() {
+        // TODO: fix it when expression with semicolon has side-effect.
+        assert_eq!(
+            Statement::new(&"1+1;".into()),
+            Ok(Statement::Expression(Expression::Empty))
         );
     }
     #[test]
     fn parse_invalid() {
         assert_eq!(
-            Statement::new(&"let a=a=1".into()),
+            Statement::new(&"let a=a=1;".into()),
             Err(StatementError::InvalidStatement)
+        );
+    }
+    #[test]
+    fn parse_binding_def_missing_semicolon() {
+        assert_eq!(
+            Statement::new(&"let a=114".into()),
+            Err(StatementError::BindingDefMissingSemicolon)
         );
     }
     #[test]
@@ -65,7 +93,7 @@ mod tests {
     fn get_expression_in_binding_def() {
         let local = &mut Environment::default();
         assert_eq!(
-            Statement::BindingDef(BindingDef::new(&"let x = 5+6;".into()).unwrap())
+            Statement::BindingDef(BindingDef::new(&"let x = 5+6".into()).unwrap())
                 .get_expression_in(local),
             Expression::Empty
         );

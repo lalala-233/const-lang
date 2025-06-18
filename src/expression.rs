@@ -1,9 +1,11 @@
 use crate::internal::prelude::*;
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Default)]
 pub enum Expression {
     Number(Number),
     Operation(Operation),
     Binding(Binding),
+    Block(Block),
+    #[default]
     Empty,
 }
 impl Expression {
@@ -17,6 +19,9 @@ impl Expression {
         if let Ok(binding) = Binding::new(s) {
             return Ok(Self::Binding(binding));
         }
+        if let Ok(block) = Block::new(s) {
+            return Ok(Self::Block(block));
+        }
         if s.is_empty() {
             return Ok(Self::Empty);
         }
@@ -27,7 +32,11 @@ impl Expression {
             Self::Number(number) => Ok(Value::Number(*number)),
             Self::Operation(operation) => Ok(operation.eval()),
             Self::Empty => Ok(Value::Empty),
-            Self::Binding(binding) => binding.get_from(env).map(|expr| expr.eval(env))?,
+            Self::Binding(binding) => binding.get_expression_from(env)?.eval(env),
+            Self::Block(block) => {
+                let local = &mut Environment::default();
+                block.get_expression_from(local).eval(local)
+            }
         }
     }
 }
@@ -52,17 +61,6 @@ mod tests {
         );
     }
     #[test]
-    fn parse_invalid_expr() {
-        assert_eq!(
-            Expression::new(&"++".into()),
-            Err(ExpressionError::InvalidExpression)
-        );
-        assert_eq!(
-            Expression::new(&"1+".into()),
-            Err(ExpressionError::InvalidExpression)
-        );
-    }
-    #[test]
     fn parse_empty() {
         assert_eq!(Expression::new(&"".into()), Ok(Expression::Empty));
     }
@@ -73,6 +71,26 @@ mod tests {
             Ok(Expression::Binding(
                 Binding::new(&"something".into()).unwrap()
             ))
+        );
+    }
+    #[test]
+    fn parse_block() {
+        assert_eq!(
+            Expression::new(&"{let x=114;x}".into()),
+            Ok(Expression::Block(
+                Block::new(&"{let x=114;x}".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
+    fn parse_invalid_expr() {
+        assert_eq!(
+            Expression::new(&"++".into()),
+            Err(ExpressionError::InvalidExpression)
+        );
+        assert_eq!(
+            Expression::new(&"1+".into()),
+            Err(ExpressionError::InvalidExpression)
         );
     }
     #[test]
@@ -99,12 +117,10 @@ mod tests {
     }
     #[test]
     fn eval_existing_binding() {
-        let mut env = Environment::default();
-        BindingDef::new(&"let a = 114;".into())
-            .unwrap()
-            .store(&mut env);
+        let env = &mut Environment::default();
+        BindingDef::new(&"let a = 114".into()).unwrap().store(env);
         assert_eq!(
-            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
+            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(env),
             Ok(Value::Number(Number::from_i32(114)))
         );
     }
@@ -114,6 +130,21 @@ mod tests {
         assert_eq!(
             Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
             Err(Error::Binding(BindingError::BindingNotFound))
+        );
+    }
+    #[test]
+    fn eval_block_with_binding() {
+        assert_eq!(
+            Expression::Block(Block::new(&"{let x = 114; x}".into()).unwrap())
+                .eval(&Environment::default()),
+            Ok(Value::Number(Number::from_i32(114)))
+        );
+    }
+    #[test]
+    fn eval_block_with_one_expr() {
+        assert_eq!(
+            Expression::Block(Block::new(&"{ 514 }".into()).unwrap()).eval(&Environment::default()),
+            Ok(Value::Number(Number::from_i32(514))),
         );
     }
 }

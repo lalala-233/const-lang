@@ -26,10 +26,10 @@ pub enum Error {
 pub enum BindingDefError {
     #[error("Expect `let` here")]
     MissingLetKeyword,
-    #[error("Expect `;` here")]
-    MissingSemicolon,
     #[error("Expect `=` here")]
     MissingEqualsSign,
+    // #[error("Invalid binding definition")]
+    // InvalidBindingDef
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperatorError {
@@ -40,8 +40,8 @@ pub enum OperatorError {
 pub enum IdentifierError {
     #[error("Identifier must start with a letter")]
     StartWithNonLetter,
-    #[error("Identifier must not contain whitespace")]
-    ContainWhitespace,
+    #[error("Identifier must not contain special characters")]
+    ContainSpecialCharacters,
     #[error("Identifier must not be empty")]
     Empty,
 }
@@ -52,6 +52,8 @@ pub enum ExpressionError {
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum StatementError {
+    #[error("Expect `;` here")]
+    BindingDefMissingSemicolon,
     #[error("Invalid statement")]
     InvalidStatement,
 }

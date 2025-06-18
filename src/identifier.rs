@@ -13,8 +13,8 @@ impl Identifier {
         if !s.starts_with(char::is_alphabetic) {
             return Err(IdentifierError::StartWithNonLetter);
         }
-        if s.chars().any(char::is_whitespace) {
-            return Err(IdentifierError::ContainWhitespace);
+        if s.chars().any(|c| !c.is_alphanumeric() && c != '_') {
+            return Err(IdentifierError::ContainSpecialCharacters);
         }
         // TODO: more checks like ops, keywords, etc.
         Ok(Self(s.into()))
@@ -42,8 +42,13 @@ mod tests {
             Identifier::new(&"foo123".into()),
             Ok(Identifier("foo123".into()))
         );
+    }    #[test]
+    fn parse_with_allowed_character() {
+        assert_eq!(
+            Identifier::new(&"foo_123_中文".into()),
+            Ok(Identifier("foo_123_中文".into()))
+        );
     }
-
     #[test]
     fn parse_start_with_number() {
         assert_eq!(
@@ -55,14 +60,20 @@ mod tests {
     fn parse_contain_whitespace() {
         assert_eq!(
             Identifier::new(&"foo bar".into()),
-            Err(IdentifierError::ContainWhitespace)
+            Err(IdentifierError::ContainSpecialCharacters)
         );
     }
     #[test]
     fn parse_contain_crlf() {
         assert_eq!(
             Identifier::new(&"foo\n b\rar".into()),
-            Err(IdentifierError::ContainWhitespace)
+            Err(IdentifierError::ContainSpecialCharacters)
+        );
+    }    #[test]
+    fn parse_contain_special_characters() {
+        assert_eq!(
+            Identifier::new(&"foo=bar".into()),
+            Err(IdentifierError::ContainSpecialCharacters)
         );
     }
     #[test]

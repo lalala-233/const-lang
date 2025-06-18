@@ -27,7 +27,7 @@ impl Expression {
         }
         Err(ExpressionError::InvalidExpression)
     }
-    fn eval(&self, env: &Environment) -> Result<Value, Error> {
+    pub fn eval(&self, env: &Environment) -> Result<Value, Error> {
         match self {
             Self::Number(number) => Ok(Value::Number(*number)),
             Self::Operation(operation) => Ok(operation.eval()),

@@ -8,9 +8,12 @@ mod identifier;
 mod number;
 mod operation;
 mod operator;
+pub mod parser;
 mod statement;
 mod trimmed_string;
 mod value;
+
+pub use parser::Parser;
 
 mod internal {
     pub mod prelude {

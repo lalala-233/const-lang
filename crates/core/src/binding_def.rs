@@ -20,12 +20,6 @@ impl BindingDef {
             expr: Expression::new(&expr.into())?,
         })
     }
-    pub const fn name(&self) -> &Identifier {
-        &self.name
-    }
-    pub const fn expr(&self) -> &Expression {
-        &self.expr
-    }
     pub fn store(&self, env: &mut Environment) {
         env.insert(self.name.clone(), self.expr.clone());
     }

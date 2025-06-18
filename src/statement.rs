@@ -15,6 +15,15 @@ impl Statement {
         }
         Err(StatementError::InvalidStatement)
     }
+    pub fn get_expression_in(&self, local: &mut Environment) -> Expression {
+        match self {
+            Self::BindingDef(binding_def) => {
+                binding_def.store(local);
+                Expression::Empty
+            }
+            Self::Expression(expression) => expression.clone(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -50,6 +59,31 @@ mod tests {
         assert_eq!(
             Statement::new(&"".into()),
             Ok(Statement::Expression(Expression::Empty))
+        );
+    }
+    #[test]
+    fn get_expression_in_binding_def() {
+        let local = &mut Environment::default();
+        assert_eq!(
+            Statement::BindingDef(BindingDef::new(&"let x = 5+6;".into()).unwrap())
+                .get_expression_in(local),
+            Expression::Empty
+        );
+        assert_eq!(
+            local.get(&Identifier::new(&"x".into()).unwrap()),
+            Some(Expression::Operation(
+                Operation::new(&"5+6".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
+    fn get_expression_in_expression() {
+        let local = &mut Environment::default();
+        assert_eq!(
+            Statement::new(&"114".into())
+                .unwrap()
+                .get_expression_in(local),
+            Expression::Number(Number::from_i32(114))
         );
     }
 }

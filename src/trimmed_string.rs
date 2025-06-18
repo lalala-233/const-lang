@@ -4,7 +4,7 @@ use std::ops::Deref;
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct TrimmedStr<'a>(&'a str);
 impl<'a> TrimmedStr<'a> {
-    fn new(s: &'a str) -> Self {
+    pub fn new(s: &'a str) -> Self {
         let s = s.trim();
         Self(s)
     }

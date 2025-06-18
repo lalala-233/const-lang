@@ -6,19 +6,31 @@ pub enum Statement {
 }
 
 impl Statement {
+    fn pre_parse(s: &TrimmedStr) -> Option<Self> {
+        if let Ok(expression) = Expression::new(s) {
+            return Some(Self::Expression(expression));
+        }
+        None
+    }
+    fn parse_after_strip_semicolon(s: &TrimmedStr) -> Option<Self> {
+        if let Ok(binding_def) = BindingDef::new(s) {
+            return Some(Self::BindingDef(binding_def));
+        }
+        if Expression::new(s).is_ok() {
+            return Some(Self::Expression(Expression::Empty));
+        }
+        None
+    }
     pub fn new(s: &TrimmedStr) -> Result<Self, StatementError> {
-        if let Ok(expr) = Expression::new(s) {
-            return Ok(Self::Expression(expr));
+        if let Some(statement) = Self::pre_parse(s) {
+            return Ok(statement);
         }
         let s = &TrimmedStr::new(
             s.strip_suffix(';')
                 .ok_or(StatementError::BindingDefMissingSemicolon)?,
         );
-        if let Ok(binding_def) = BindingDef::new(s) {
-            return Ok(Self::BindingDef(binding_def));
-        }
-        if Expression::new(s).is_ok() {
-            return Ok(Self::Expression(Expression::Empty));
+        if let Some(statement) = Self::parse_after_strip_semicolon(s) {
+            return Ok(statement);
         }
         Err(StatementError::InvalidStatement)
     }
@@ -46,7 +58,7 @@ mod tests {
         );
     }
     #[test]
-    fn parse_expr() {
+    fn parse_expression_without_semicolon() {
         assert_eq!(
             Statement::new(&"114+514".into()),
             Ok(Statement::Expression(Expression::Operation(
@@ -73,6 +85,29 @@ mod tests {
         assert_eq!(
             Statement::new(&"let a=a=1;".into()),
             Err(StatementError::InvalidStatement)
+        );
+    }
+    #[test]
+    fn pre_parse() {
+        assert_eq!(Statement::pre_parse(&"let x = 1+1".into()), None);
+        assert_eq!(
+            Statement::pre_parse(&"1+1".into()),
+            Some(Statement::Expression(Expression::Operation(
+                Operation::new(&"1+1".into()).unwrap()
+            )))
+        );
+    }
+    #[test]
+    fn parse_after_strip_semicolon() {
+        assert_eq!(
+            Statement::parse_after_strip_semicolon(&"1+1".into()),
+            Some(Statement::Expression(Expression::Empty))
+        );
+        assert_eq!(
+            Statement::parse_after_strip_semicolon(&"let x = 1+1".into()),
+            Some(Statement::BindingDef(
+                BindingDef::new(&"let x = 1+1".into()).unwrap()
+            ))
         );
     }
     #[test]

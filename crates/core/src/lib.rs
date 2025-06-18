@@ -4,6 +4,7 @@ mod block;
 mod environment;
 mod error;
 mod expression;
+mod function_def;
 mod identifier;
 mod number;
 mod operation;
@@ -24,6 +25,7 @@ mod internal {
             environment::Environment,
             error::*,
             expression::Expression,
+            function_def::FunctionDef,
             identifier::Identifier,
             number::Number,
             operation::Operation,

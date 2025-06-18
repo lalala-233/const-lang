@@ -34,7 +34,7 @@ impl Expression {
             Self::Empty => Ok(Value::Empty),
             Self::Binding(binding) => binding.get_expression_from(env)?.eval(env),
             Self::Block(block) => {
-                let local = &mut Environment::default();
+                let local = &mut env.create_child();
                 block.get_expression_from(local).eval(local)
             }
         }
@@ -145,6 +145,20 @@ mod tests {
         assert_eq!(
             Expression::Block(Block::new(&"{ 514 }".into()).unwrap()).eval(&Environment::default()),
             Ok(Value::Number(Number::from_i32(514))),
+        );
+    }
+    #[test]
+    fn eval_block_from_parent() {
+        let env = {
+            let mut binding = Environment::default();
+            BindingDef::new(&"let a = 11451".into())
+                .unwrap()
+                .store(&mut binding);
+            binding
+        };
+        assert_eq!(
+            Expression::Block(Block::new(&"{ let b = a; b }".into()).unwrap()).eval(&env),
+            Ok(Value::Number(Number::from_i32(11451)))
         );
     }
 }

@@ -42,7 +42,8 @@ mod tests {
             Identifier::new(&"foo123".into()),
             Ok(Identifier("foo123".into()))
         );
-    }    #[test]
+    }
+    #[test]
     fn parse_with_allowed_character() {
         assert_eq!(
             Identifier::new(&"foo_123_中文".into()),
@@ -69,7 +70,8 @@ mod tests {
             Identifier::new(&"foo\n b\rar".into()),
             Err(IdentifierError::ContainSpecialCharacters)
         );
-    }    #[test]
+    }
+    #[test]
     fn parse_contain_special_characters() {
         assert_eq!(
             Identifier::new(&"foo=bar".into()),

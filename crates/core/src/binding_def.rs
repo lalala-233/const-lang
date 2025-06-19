@@ -16,7 +16,7 @@ impl BindingDef {
             .ok_or(BindingDefError::MissingEqualsSign)?;
 
         Ok(Self {
-            name: Identifier::new(&identifier.into())?,
+            name: identifier.try_into()?,
             expr: Expression::new(&expr.into())?,
         })
     }
@@ -33,7 +33,7 @@ mod tests {
         assert_eq!(
             BindingDef::new(&"let foo = 1 + 1".into()),
             Ok(BindingDef {
-                name: Identifier::new(&"foo".into()).unwrap(),
+                name: "foo".try_into().unwrap(),
                 expr: Expression::Operation(Operation::new(&"1 + 1".into()).unwrap())
             })
         );
@@ -43,7 +43,7 @@ mod tests {
         assert_eq!(
             BindingDef::new(&"let foo = 3".into()),
             Ok(BindingDef {
-                name: Identifier::new(&"foo".into()).unwrap(),
+                name: "foo".try_into().unwrap(),
                 expr: Expression::Number(Number::from_i32(3))
             })
         );

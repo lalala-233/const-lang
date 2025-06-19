@@ -3,12 +3,16 @@ use crate::internal::prelude::*;
 pub enum Statement {
     BindingDef(BindingDef),
     Expression(Expression),
+    FunctionDef(FunctionDef),
 }
 
 impl Statement {
     fn pre_parse(s: &TrimmedStr) -> Option<Self> {
         if let Ok(expression) = Expression::new(s) {
             return Some(Self::Expression(expression));
+        }
+        if let Ok(function_def) = FunctionDef::new(s) {
+            return Some(Self::FunctionDef(function_def));
         }
         None
     }
@@ -41,6 +45,7 @@ impl Statement {
                 Expression::Empty
             }
             Self::Expression(expression) => expression.clone(),
+            Self::FunctionDef(_) => todo!(),
         }
     }
 }
@@ -54,6 +59,15 @@ mod tests {
             Statement::new(&"let x = 5;".into()),
             Ok(Statement::BindingDef(
                 BindingDef::new(&"let x = 5".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
+    fn parse_function_def() {
+        assert_eq!(
+            Statement::new(&"fn one_add_one => 1+1".into()),
+            Ok(Statement::FunctionDef(
+                FunctionDef::new(&"fn one_add_one => 1+1".into()).unwrap()
             ))
         );
     }
@@ -96,6 +110,12 @@ mod tests {
                 Operation::new(&"1+1".into()).unwrap()
             )))
         );
+        assert_eq!(
+            Statement::pre_parse(&"fn one_add_one => 2".into()),
+            Some(Statement::FunctionDef(
+                FunctionDef::new(&"fn one_add_one => 2".into()).unwrap()
+            ))
+        );
     }
     #[test]
     fn parse_after_strip_semicolon() {
@@ -108,6 +128,10 @@ mod tests {
             Some(Statement::BindingDef(
                 BindingDef::new(&"let x = 1+1".into()).unwrap()
             ))
+        );
+        assert_eq!(
+            Statement::parse_after_strip_semicolon(&"fn one_add_one => 2".into()),
+            None
         );
     }
     #[test]
@@ -133,7 +157,7 @@ mod tests {
             Expression::Empty
         );
         assert_eq!(
-            local.get(&Identifier::new(&"x".into()).unwrap()),
+            local.get(&"x".try_into().unwrap()),
             Some(Expression::Operation(
                 Operation::new(&"5+6".into()).unwrap()
             ))
@@ -148,5 +172,15 @@ mod tests {
                 .get_expression_in(local),
             Expression::Number(Number::from_i32(114))
         );
+    }
+    #[test]
+    fn get_expression_in_function_def() {
+        let local = &mut Environment::default();
+        todo!()
+        // assert_eq!(
+        //     Statement::FunctionDef(FunctionDef::new(&"fn add_one x => x + 1".into()).unwrap())
+        //         .get_expression_in(local),
+        //     Expression::Empty
+        // );
     }
 }

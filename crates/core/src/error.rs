@@ -4,6 +4,8 @@ use thiserror::Error;
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum Error {
     #[error(transparent)]
+    FunctionDef(#[from] FunctionDefError),
+    #[error(transparent)]
     Statement(#[from] StatementError),
     #[error(transparent)]
     Expression(#[from] ExpressionError),
@@ -78,4 +80,13 @@ pub enum BlockError {
     MissingOpeningBrace,
     #[error("Missing closing brace `}}`")]
     MissingClosingBrace,
+}
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum FunctionDefError {
+    #[error("Expect `fn` here")]
+    MissingFnKeyword,
+    #[error("Invalid function definition")]
+    InvalidFunctionDef,
+    #[error("Expect `=>` here")]
+    MissingArrow,
 }

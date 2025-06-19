@@ -5,9 +5,10 @@ pub struct Binding {
     name: Identifier,
 }
 impl Binding {
-    pub fn new(name: &TrimmedStr) -> Result<Self, Error> {
-        let name = Identifier::new(name)?;
-        Ok(Self { name })
+    pub fn new(name: &str) -> Result<Self, Error> {
+        Ok(Self {
+            name: name.try_into()?,
+        })
     }
     pub fn get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
         env.get(&self.name).ok_or(BindingError::BindingNotFound)
@@ -19,7 +20,7 @@ mod tests {
     #[test]
     fn parse_binding() {
         assert_eq!(
-            Binding::new(&"foo".into()),
+            Binding::new("foo"),
             Ok(Binding {
                 name: "foo".try_into().unwrap()
             })
@@ -28,14 +29,14 @@ mod tests {
     #[test]
     fn parse_binding_error() {
         assert!(matches!(
-            Binding::new(&"114514abc".into()),
+            Binding::new("114514abc"),
             Err(Error::Identifier(IdentifierError::StartWithNonLetter))
         ));
     }
     #[test]
     fn parse_empty() {
         assert!(matches!(
-            Binding::new(&"".into()),
+            Binding::new(""),
             Err(Error::Identifier(IdentifierError::Empty))
         ));
     }
@@ -46,9 +47,7 @@ mod tests {
             .unwrap()
             .store(env);
         assert_eq!(
-            Binding::new(&"foo".into())
-                .unwrap()
-                .get_expression_from(env),
+            Binding::new("foo").unwrap().get_expression_from(env),
             Ok(Expression::Number(Number::from_i32(11451)))
         );
     }
@@ -56,9 +55,7 @@ mod tests {
     fn eval_non_exist_binding() {
         let env = Environment::default();
         assert_eq!(
-            Binding::new(&"foo".into())
-                .unwrap()
-                .get_expression_from(&env),
+            Binding::new("foo").unwrap().get_expression_from(&env),
             Err(BindingError::BindingNotFound)
         );
     }

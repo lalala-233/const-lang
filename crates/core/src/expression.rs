@@ -69,7 +69,7 @@ mod tests {
         assert_eq!(
             Expression::new(&"something".into()),
             Ok(Expression::Binding(
-                Binding::new(&"something".into()).unwrap()
+                Binding::new("something").unwrap()
             ))
         );
     }
@@ -120,7 +120,7 @@ mod tests {
         let env = &mut Environment::default();
         BindingDef::new(&"let a = 114".into()).unwrap().store(env);
         assert_eq!(
-            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(env),
+            Expression::Binding(Binding::new("a").unwrap()).eval(env),
             Ok(Value::Number(Number::from_i32(114)))
         );
     }
@@ -128,7 +128,7 @@ mod tests {
     fn eval_non_existing_binding() {
         let env = Environment::default();
         assert_eq!(
-            Expression::Binding(Binding::new(&"a".into()).unwrap()).eval(&env),
+            Expression::Binding(Binding::new("a").unwrap()).eval(&env),
             Err(Error::Binding(BindingError::BindingNotFound))
         );
     }

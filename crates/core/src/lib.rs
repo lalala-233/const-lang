@@ -1,4 +1,3 @@
-mod binding;
 mod binding_def;
 mod block;
 mod environment;
@@ -19,7 +18,6 @@ pub use parser::Parser;
 mod internal {
     pub mod prelude {
         pub use crate::{
-            binding::Binding,
             binding_def::BindingDef,
             block::Block,
             environment::Environment,

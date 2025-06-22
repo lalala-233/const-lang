@@ -63,7 +63,7 @@ mod tests {
             Block::new(&"{ a }".into()),
             Ok(Block {
                 statements: vec![Statement::Expression(Expression::Binding(
-                    Binding::new("a").unwrap()
+                    Identifier::new(&"a".into()).unwrap()
                 ))]
             })
         );
@@ -81,7 +81,9 @@ mod tests {
                 statements: vec![
                     Statement::BindingDef(BindingDef::new(&"let a = 11451".into()).unwrap()),
                     Statement::BindingDef(BindingDef::new(&"let b = a".into()).unwrap()),
-                    Statement::Expression(Expression::Binding(Binding::new("b").unwrap()))
+                    Statement::Expression(Expression::Binding(
+                        Identifier::new(&"b".into()).unwrap()
+                    ))
                 ]
             })
         );
@@ -93,7 +95,9 @@ mod tests {
             Ok(Block {
                 statements: vec![
                     Statement::BindingDef(BindingDef::new(&"let a = 1".into()).unwrap()),
-                    Statement::Expression(Expression::Binding(Binding::new("a").unwrap()))
+                    Statement::Expression(Expression::Binding(
+                        Identifier::new(&"a".into()).unwrap()
+                    ))
                 ]
             })
         );
@@ -138,7 +142,7 @@ mod tests {
             Block::new(&"{let a = 11451; let b = 11452; b}".into())
                 .unwrap()
                 .get_expression_from(local),
-            Expression::Binding(Binding::new("b").unwrap())
+            Expression::Binding(Identifier::new(&"b".into()).unwrap())
         );
         assert_eq!(
             local.get(&"a".try_into().unwrap()),

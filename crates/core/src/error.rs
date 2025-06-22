@@ -76,7 +76,7 @@ pub enum NumberError {
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BindingError {
     #[error("Binding is not found")]
-    BindingNotFound,
+    NotFound,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum BlockError {

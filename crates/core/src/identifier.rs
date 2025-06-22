@@ -3,7 +3,9 @@ use std::str::FromStr;
 use crate::internal::prelude::*;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct Identifier(TrimmedString);
+pub struct Identifier {
+    name: TrimmedString,
+}
 
 impl Identifier {
     pub fn new(s: &TrimmedStr) -> Result<Self, IdentifierError> {
@@ -17,7 +19,10 @@ impl Identifier {
             return Err(IdentifierError::ContainSpecialCharacters);
         }
         // TODO: more checks like ops, keywords, etc.
-        Ok(Self(s.into()))
+        Ok(Self { name: s.into() })
+    }
+    pub fn get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
+        env.get(self).ok_or(BindingError::NotFound)
     }
 }
 impl FromStr for Identifier {
@@ -40,14 +45,18 @@ mod tests {
     fn parse_identifier() {
         assert_eq!(
             Identifier::new(&"foo123".into()),
-            Ok(Identifier("foo123".into()))
+            Ok(Identifier {
+                name: "foo123".into()
+            })
         );
     }
     #[test]
     fn parse_with_allowed_character() {
         assert_eq!(
             Identifier::new(&"foo_123_中文".into()),
-            Ok(Identifier("foo_123_中文".into()))
+            Ok(Identifier {
+                name: "foo_123_中文".into()
+            })
         );
     }
     #[test]
@@ -87,6 +96,30 @@ mod tests {
         assert_eq!(
             Identifier::new(&"         \n".into()),
             Err(IdentifierError::Empty)
+        );
+    }
+    // Test from binding
+    #[test]
+    fn get_expression_with_existing_identifier() {
+        let env = &mut Environment::default();
+        BindingDef::new(&"let foo = 11451".into())
+            .unwrap()
+            .store(env);
+        assert_eq!(
+            Identifier::new(&"foo".into())
+                .unwrap()
+                .get_expression_from(env),
+            Ok(Expression::Number(Number::from_i32(11451)))
+        );
+    }
+    #[test]
+    fn get_expression_with_non_exist_identifier() {
+        let env = Environment::default();
+        assert_eq!(
+            Identifier::new(&"foo".into())
+                .unwrap()
+                .get_expression_from(&env),
+            Err(BindingError::NotFound)
         );
     }
 }

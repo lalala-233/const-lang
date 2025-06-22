@@ -49,7 +49,7 @@ mod tests {
             Ok(FunctionDef {
                 name: "foo".try_into().unwrap(),
                 parameters: vec!["x".try_into().unwrap()],
-                body: Expression::Binding(Binding::new("x").unwrap()),
+                body: Expression::Binding(Identifier::new(&"x".into()).unwrap()),
             })
         );
     }

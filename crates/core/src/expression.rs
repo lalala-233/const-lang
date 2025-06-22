@@ -3,7 +3,7 @@ use crate::internal::prelude::*;
 pub enum Expression {
     Number(Number),
     Operation(Operation),
-    Binding(Binding),
+    Binding(Identifier),
     Block(Block),
     #[default]
     Empty,
@@ -19,7 +19,7 @@ impl Expression {
         if let Ok(number) = Number::new(s) {
             return Ok(Self::Number(number));
         }
-        if let Ok(binding) = Binding::new(s) {
+        if let Ok(binding) = Identifier::new(s) {
             return Ok(Self::Binding(binding));
         }
         if let Ok(block) = Block::new(s) {
@@ -80,7 +80,9 @@ mod tests {
     fn parse_binding() {
         assert_eq!(
             Expression::new(&"something".into()),
-            Ok(Expression::Binding(Binding::new("something").unwrap()))
+            Ok(Expression::Binding(
+                Identifier::new(&"something".into()).unwrap()
+            ))
         );
     }
     #[test]
@@ -139,7 +141,7 @@ mod tests {
         let env = &mut Environment::default();
         BindingDef::new(&"let a = 114".into()).unwrap().store(env);
         assert_eq!(
-            Expression::Binding(Binding::new("a").unwrap()).eval(env),
+            Expression::Binding(Identifier::new(&"a".into()).unwrap()).eval(env),
             Ok(Value::Number(Number::from_i32(114)))
         );
     }
@@ -147,8 +149,8 @@ mod tests {
     fn eval_non_existing_binding() {
         let env = Environment::default();
         assert_eq!(
-            Expression::Binding(Binding::new("a").unwrap()).eval(&env),
-            Err(Error::Binding(BindingError::BindingNotFound))
+            Expression::Binding(Identifier::new(&"a".into()).unwrap()).eval(&env),
+            Err(Error::Binding(BindingError::NotFound))
         );
     }
     #[test]

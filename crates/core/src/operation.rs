@@ -65,8 +65,8 @@ mod tests {
         assert_eq!(
             Operation::new(&"x - y".into()),
             Ok(Operation {
-                lhs: Expression::Binding(Binding::new("x").unwrap()).into(),
-                rhs: Expression::Binding(Binding::new("y").unwrap()).into(),
+                lhs: Expression::Binding(Identifier::new(&"x".into()).unwrap()).into(),
+                rhs: Expression::Binding(Identifier::new(&"y".into()).unwrap()).into(),
                 op: Operator::Sub
             })
         );
@@ -151,7 +151,7 @@ mod tests {
         );
         assert_eq!(
             Operation::new(&"z+1".into()).unwrap().eval(local),
-            Err(Error::Binding(BindingError::BindingNotFound))
+            Err(Error::Binding(BindingError::NotFound))
         );
     }
     #[test]

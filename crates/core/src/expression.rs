@@ -9,6 +9,9 @@ pub enum Expression {
     Empty,
 }
 impl Expression {
+    pub const fn is_empty(&self) -> bool {
+        matches!(self, Self::Empty)
+    }
     pub fn new(s: &TrimmedStr) -> Result<Self, ExpressionError> {
         if let Ok(op) = Operation::new(s) {
             return Ok(Self::Operation(op));
@@ -30,7 +33,7 @@ impl Expression {
     pub fn eval(&self, env: &Environment) -> Result<Value, Error> {
         match self {
             Self::Number(number) => Ok(Value::Number(*number)),
-            Self::Operation(operation) => Ok(operation.eval()),
+            Self::Operation(operation) => operation.eval(env),
             Self::Empty => Ok(Value::Empty),
             Self::Binding(binding) => binding.get_expression_from(env)?.eval(env),
             Self::Block(block) => {
@@ -45,11 +48,20 @@ impl Expression {
 mod tests {
     use super::*;
     #[test]
-    fn parse_operation() {
+    fn parse_operation_without_binding() {
         assert_eq!(
             Expression::new(&"1+2".into()),
             Ok(Expression::Operation(
                 Operation::new(&"1+2".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
+    fn parse_operation_with_binding() {
+        assert_eq!(
+            Expression::new(&"x+2".into()),
+            Ok(Expression::Operation(
+                Operation::new(&"x+2".into()).unwrap()
             ))
         );
     }
@@ -68,9 +80,7 @@ mod tests {
     fn parse_binding() {
         assert_eq!(
             Expression::new(&"something".into()),
-            Ok(Expression::Binding(
-                Binding::new("something").unwrap()
-            ))
+            Ok(Expression::Binding(Binding::new("something").unwrap()))
         );
     }
     #[test]
@@ -94,11 +104,20 @@ mod tests {
         );
     }
     #[test]
-    fn eval_operation() {
+    fn eval_operation_without_binding() {
         assert_eq!(
             Expression::Operation(Operation::new(&"114+514".into()).unwrap())
                 .eval(&Environment::default()),
             Ok(Value::Number(Number::from_i32(114 + 514)))
+        );
+    }
+    #[test]
+    fn eval_operation_with_binding() {
+        let env = &mut Environment::default();
+        BindingDef::new(&"let x = 114".into()).unwrap().store(env);
+        assert_eq!(
+            Expression::Operation(Operation::new(&"x+2".into()).unwrap()).eval(env),
+            Ok(Value::Number(Number::from_i32(114 + 2)))
         );
     }
     #[test]

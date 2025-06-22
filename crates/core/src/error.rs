@@ -63,6 +63,10 @@ pub enum StatementError {
 pub enum OperationError {
     #[error("Operator is not found")]
     OperatorNotFound,
+    #[error("Expect a number in the left-hand side")]
+    InvalidLhs,
+    #[error("Expect a number in the right-hand side")]
+    InvalidRhs,
 }
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum NumberError {

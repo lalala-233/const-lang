@@ -53,4 +53,15 @@ mod tests {
             })
         );
     }
+    #[test]
+    fn parse_function_def_with_multiple_parameter() {
+        assert_eq!(
+            FunctionDef::new(&"fn add x y => x + y ".into()),
+            Ok(FunctionDef {
+                name: "add".try_into().unwrap(),
+                parameters: vec!["x".try_into().unwrap(), "y".try_into().unwrap()],
+                body: Expression::Operation(Operation::new(&"x + y".into()).unwrap()),
+            })
+        );
+    }
 }

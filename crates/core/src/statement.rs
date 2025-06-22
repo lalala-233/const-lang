@@ -42,11 +42,11 @@ impl Statement {
         match self {
             Self::BindingDef(binding_def) => {
                 binding_def.store(local);
-                Expression::Empty
             }
-            Self::Expression(expression) => expression.clone(),
-            Self::FunctionDef(_) => todo!(),
+            Self::Expression(expression) => return expression.clone(),
+            Self::FunctionDef(_) => (),
         }
+        Expression::Empty
     }
 }
 
@@ -69,6 +69,10 @@ mod tests {
             Ok(Statement::FunctionDef(
                 FunctionDef::new(&"fn one_add_one => 1+1".into()).unwrap()
             ))
+        );
+        assert_eq!(
+            Statement::new(&"fn add_one x => x + 1".into()),
+            Ok(Statement::FunctionDef(FunctionDef::new(&"fn add_one x => x + 1".into()).unwrap()))
         );
     }
     #[test]
@@ -176,11 +180,10 @@ mod tests {
     #[test]
     fn get_expression_in_function_def() {
         let local = &mut Environment::default();
-        todo!()
-        // assert_eq!(
-        //     Statement::FunctionDef(FunctionDef::new(&"fn add_one x => x + 1".into()).unwrap())
-        //         .get_expression_in(local),
-        //     Expression::Empty
-        // );
+        assert_eq!(
+            Statement::FunctionDef(FunctionDef::new(&"fn add_one x => x + 1".into()).unwrap())
+                .get_expression_in(local),
+            Expression::Empty
+        );
     }
 }

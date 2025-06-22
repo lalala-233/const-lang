@@ -21,7 +21,7 @@ impl BindingDef {
         })
     }
     pub fn store(&self, env: &mut Environment) {
-        env.insert(self.name.clone(), self.expr.clone());
+        env.insert_binding(self.name.clone(), self.expr.clone());
     }
 }
 

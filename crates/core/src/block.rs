@@ -145,11 +145,11 @@ mod tests {
             Expression::Binding(Identifier::new(&"b".into()).unwrap())
         );
         assert_eq!(
-            local.get(&"a".try_into().unwrap()),
+            local.get_binding_by(&"a".try_into().unwrap()),
             Some(Expression::Number(Number::from_i32(11451)))
         );
         assert_eq!(
-            local.get(&"b".try_into().unwrap()),
+            local.get_binding_by(&"b".try_into().unwrap()),
             Some(Expression::Number(Number::from_i32(11452)))
         );
     }

@@ -5,6 +5,7 @@ mod error;
 mod expression;
 mod function_def;
 mod identifier;
+mod named_value;
 mod number;
 mod operation;
 mod operator;
@@ -25,6 +26,7 @@ mod internal {
             expression::Expression,
             function_def::FunctionDef,
             identifier::Identifier,
+            named_value::NamedValue,
             number::Number,
             operation::Operation,
             operator::Operator,

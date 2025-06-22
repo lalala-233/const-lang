@@ -22,7 +22,7 @@ impl Identifier {
         Ok(Self { name: s.into() })
     }
     pub fn get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
-        env.get(self).ok_or(BindingError::NotFound)
+        env.get_binding_by(self).ok_or(BindingError::NotFound)
     }
 }
 impl FromStr for Identifier {

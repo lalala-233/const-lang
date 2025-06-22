@@ -27,6 +27,13 @@ impl FunctionDef {
             body,
         })
     }
+    pub fn store(&self, env: &mut Environment) {
+        env.insert_function(
+            self.name.clone(),
+            self.parameters.clone(),
+            self.body.clone(),
+        );
+    }
 }
 #[cfg(test)]
 mod tests {

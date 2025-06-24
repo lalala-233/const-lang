@@ -10,12 +10,8 @@ impl FunctionDef {
         let Some(s) = s.strip_prefix("fn ") else {
             return Err(FunctionDefError::MissingFnKeyword)?;
         };
-        let (name, rest) = s
-            .split_once(' ')
-            .ok_or(FunctionDefError::InvalidFunctionDef)?;
-        let (parameters, body) = rest
-            .split_once("=>")
-            .ok_or(FunctionDefError::MissingArrow)?;
+        let (rest, body) = s.split_once("=>").ok_or(FunctionDefError::MissingArrow)?;
+        let (name, parameters) = rest.trim().split_once(' ').unwrap_or((rest, ""));
         let parameters = parameters
             .split_whitespace()
             .filter_map(|s| s.try_into().ok())
@@ -41,7 +37,7 @@ mod tests {
     #[test]
     fn parse_function_def_with_no_parameters() {
         assert_eq!(
-            FunctionDef::new(&"fn nothing => {}".into()),
+            FunctionDef::new(&"fn nothing=>{}".into()),
             Ok(FunctionDef {
                 name: "nothing".try_into().unwrap(),
                 parameters: vec![],
@@ -52,7 +48,7 @@ mod tests {
     #[test]
     fn parse_function_def_with_one_parameter() {
         assert_eq!(
-            FunctionDef::new(&"fn foo x => x ".into()),
+            FunctionDef::new(&"fn foo x=>x ".into()),
             Ok(FunctionDef {
                 name: "foo".try_into().unwrap(),
                 parameters: vec!["x".try_into().unwrap()],
@@ -61,14 +57,30 @@ mod tests {
         );
     }
     #[test]
-    fn parse_function_def_with_multiple_parameter() {
+    fn parse_function_def_with_parameter() {
         assert_eq!(
-            FunctionDef::new(&"fn add x y => x + y ".into()),
+            FunctionDef::new(&"fn add x y=>x + y ".into()),
             Ok(FunctionDef {
                 name: "add".try_into().unwrap(),
                 parameters: vec!["x".try_into().unwrap(), "y".try_into().unwrap()],
                 body: Expression::Operation(Operation::new(&"x + y".into()).unwrap()),
             })
+        );
+    }
+    #[test]
+    fn parse_invalid_function_def() {
+        assert_eq!(
+            FunctionDef::new(&"fn invalid".into()),
+            Err(Error::FunctionDef(FunctionDefError::MissingArrow))
+        );
+        assert_eq!(
+            FunctionDef::new(&"invalid fn x => x".into()),
+            Err(Error::FunctionDef(FunctionDefError::MissingFnKeyword))
+        );
+        // TODO: fix it because x is undefined
+        assert_eq!(
+            FunctionDef::new(&"invalid fn => x".into()),
+            Err(Error::FunctionDef(FunctionDefError::MissingFnKeyword))
         );
     }
 }

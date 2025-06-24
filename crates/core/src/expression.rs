@@ -5,6 +5,7 @@ pub enum Expression {
     Operation(Operation),
     Binding(Identifier),
     Block(Block),
+    FunctionCall(FunctionCall),
     #[default]
     Empty,
 }
@@ -25,6 +26,9 @@ impl Expression {
         if let Ok(block) = Block::new(s) {
             return Ok(Self::Block(block));
         }
+        if let Ok(function_call) = FunctionCall::new(s) {
+            return Ok(Self::FunctionCall(function_call));
+        }
         if s.is_empty() {
             return Ok(Self::Empty);
         }
@@ -35,7 +39,11 @@ impl Expression {
             Self::Number(number) => Ok(Value::Number(*number)),
             Self::Operation(operation) => operation.eval(env),
             Self::Empty => Ok(Value::Empty),
-            Self::Binding(binding) => binding.get_expression_from(env)?.eval(env),
+            Self::Binding(binding) => binding.try_get_expression_from(env)?.eval(env),
+            Self::FunctionCall(function_call) => {
+                let local = &mut env.create_child();
+                function_call.try_get_expression_from(local)?.eval(local)
+            }
             Self::Block(block) => {
                 let local = &mut env.create_child();
                 block.get_expression_from(local).eval(local)
@@ -91,6 +99,22 @@ mod tests {
             Expression::new(&"{let x=114;x}".into()),
             Ok(Expression::Block(
                 Block::new(&"{let x=114;x}".into()).unwrap()
+            ))
+        );
+    }
+    #[test]
+    fn parse_function_call() {
+        // Note: it will be parsed into Binding.
+        // assert_eq!(
+        //     Expression::new(&"say_hello".into()),
+        //     Ok(Expression::FunctionCall(FunctionCall::new(
+        //         &"say_hello".into()
+        //     ).unwrap()))
+        // );
+        assert_eq!(
+            Expression::new(&"add x y".into()),
+            Ok(Expression::FunctionCall(
+                FunctionCall::new(&"add x y".into()).unwrap()
             ))
         );
     }
@@ -170,7 +194,7 @@ mod tests {
     }
     #[test]
     fn eval_block_from_parent() {
-        let env = {
+        let env = &{
             let mut binding = Environment::default();
             BindingDef::new(&"let a = 11451".into())
                 .unwrap()
@@ -178,8 +202,34 @@ mod tests {
             binding
         };
         assert_eq!(
-            Expression::Block(Block::new(&"{ let b = a; b }".into()).unwrap()).eval(&env),
+            Expression::Block(Block::new(&"{ let b = a; b }".into()).unwrap()).eval(env),
             Ok(Value::Number(Number::from_i32(11451)))
+        );
+    }
+    #[test]
+    #[should_panic]
+    fn eval_function_call_with_no_parameters() {
+        let env = &mut Environment::default();
+        FunctionDef::new(&"fn homo_number => 114+514".into())
+            .unwrap()
+            .store(env);
+        // TODO: fix it because now expression will parse it as a binding
+        assert_eq!(
+            Expression::new(&"homo_number".into()).unwrap().eval(env),
+            Ok(Value::Number(Number::from_i32(114 + 514)))
+        );
+    }
+    #[test]
+    fn eval_function_call_with_parameters() {
+        let env = &mut Environment::default();
+        FunctionDef::new(&"fn add x y=> x + y".into())
+            .unwrap()
+            .store(env);
+        BindingDef::new(&"let a = 114".into()).unwrap().store(env);
+        BindingDef::new(&"let b = 514".into()).unwrap().store(env);
+        assert_eq!(
+            Expression::new(&"add a b".into()).unwrap().eval(env),
+            Ok(Value::Number(Number::from_i32(114 + 514)))
         );
     }
 }

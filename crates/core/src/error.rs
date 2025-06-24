@@ -4,6 +4,8 @@ use thiserror::Error;
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum Error {
     #[error(transparent)]
+    FunctionCall(#[from] FunctionCallError),
+    #[error(transparent)]
     FunctionDef(#[from] FunctionDefError),
     #[error(transparent)]
     Statement(#[from] StatementError),
@@ -62,7 +64,7 @@ pub enum StatementError {
 #[derive(Error, Debug, PartialEq, Eq)]
 pub enum OperationError {
     #[error("Operator is not found")]
-    OperatorNotFound,
+    NotFound,
     #[error("Expect a number in the left-hand side")]
     InvalidLhs,
     #[error("Expect a number in the right-hand side")]
@@ -89,8 +91,17 @@ pub enum BlockError {
 pub enum FunctionDefError {
     #[error("Expect `fn` here")]
     MissingFnKeyword,
-    #[error("Invalid function definition")]
-    InvalidFunctionDef,
+    // #[error("Invalid function definition")]
+    // InvalidFunctionDef,
     #[error("Expect `=>` here")]
     MissingArrow,
+}
+#[derive(Error, Debug, PartialEq, Eq)]
+pub enum FunctionCallError {
+    #[error("Function call is not found")]
+    NotFound,
+    #[error("Wrong parameter count, expected {expected}, got {got}")]
+    WrongParameterCount { expected: usize, got: usize },
+    #[error("Expect a function call here")]
+    Empty,
 }

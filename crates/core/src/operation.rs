@@ -11,7 +11,7 @@ impl Operation {
         // find and parse is not the best, but it's simple
         let nth = s
             .find(Operator::OP_CHAR_LIST)
-            .ok_or(OperationError::OperatorNotFound)?;
+            .ok_or(OperationError::NotFound)?;
         let (lhs, s) = s.split_at(nth);
         let (op, rhs) = s.split_at(Operator::LEN_OF_OP);
         let lhs = Expression::new(&lhs.into())?;
@@ -49,8 +49,16 @@ impl Operation {
 mod tests {
     use super::*;
     #[test]
+    fn parse_empty() {
+        assert_eq!(
+            Operation::new(&"".into()),
+            Err(Error::Operation(OperationError::NotFound))
+        );
+    }
+    #[test]
+    #[should_panic]
     fn parse_block() {
-        // TODO: fix it
+        // TODO: fix it because now expression cannot parse symbols in block
         assert_eq!(
             Operation::new(&"{let x = 0; x + 1} + 2".into()),
             Ok(Operation {
@@ -75,7 +83,7 @@ mod tests {
     fn parse_without_operator() {
         assert_eq!(
             Operation::new(&"1".into()),
-            Err(Error::Operation(OperationError::OperatorNotFound))
+            Err(Error::Operation(OperationError::NotFound))
         );
     }
     #[test]
@@ -155,8 +163,9 @@ mod tests {
         );
     }
     #[test]
+    #[should_panic]
     fn eval_block_without_last_expression() {
-        // TODO: fix it
+        // TODO: fix it because now expression cannot parse symbols in block
         assert_eq!(
             Operation::new(&"{1+1;}+1".into())
                 .unwrap()
@@ -165,8 +174,9 @@ mod tests {
         );
     }
     #[test]
+    #[should_panic]
     fn eval_block_with_last_expression() {
-        // TODO: fix it
+        // TODO: fix it because now expression cannot parse symbols in block
         assert_eq!(
             Operation::new(&"{let x = 1; x + 2} + 3".into())
                 .unwrap()

@@ -161,10 +161,10 @@ mod tests {
             Expression::Empty
         );
         assert_eq!(
-            local.get_binding_by(&"x".try_into().unwrap()),
-            Some(Expression::Operation(
+            local.get_from_self_and_parent(&"x".try_into().unwrap()),
+            Some(NamedValue::Binding(Expression::Operation(
                 Operation::new(&"5+6".into()).unwrap()
-            ))
+            )))
         );
     }
     #[test]

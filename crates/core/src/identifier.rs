@@ -21,8 +21,10 @@ impl Identifier {
         // TODO: more checks like ops, keywords, etc.
         Ok(Self { name: s.into() })
     }
-    pub fn get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
-        env.get_binding_by(self).ok_or(BindingError::NotFound)
+    pub fn try_get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
+        env.get_from_self_and_parent(self)
+            .and_then(NamedValue::into_expression)
+            .ok_or(BindingError::NotFound)
     }
 }
 impl FromStr for Identifier {
@@ -35,6 +37,19 @@ impl TryFrom<&str> for Identifier {
     type Error = IdentifierError;
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         Self::new(&s.into())
+    }
+}
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+struct TrimmedString(String);
+impl From<&TrimmedStr<'_>> for TrimmedString {
+    fn from(value: &TrimmedStr<'_>) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<&str> for TrimmedString {
+    fn from(value: &str) -> Self {
+        let trimmed_str = &TrimmedStr::new(value);
+        trimmed_str.into()
     }
 }
 #[cfg(test)]
@@ -108,17 +123,17 @@ mod tests {
         assert_eq!(
             Identifier::new(&"foo".into())
                 .unwrap()
-                .get_expression_from(env),
+                .try_get_expression_from(env),
             Ok(Expression::Number(Number::from_i32(11451)))
         );
     }
     #[test]
-    fn get_expression_with_non_exist_identifier() {
+    fn get_expression_with_non_existing_identifier() {
         let env = Environment::default();
         assert_eq!(
             Identifier::new(&"foo".into())
                 .unwrap()
-                .get_expression_from(&env),
+                .try_get_expression_from(&env),
             Err(BindingError::NotFound)
         );
     }

@@ -69,7 +69,7 @@ mod tests {
         );
     }
     #[test]
-    fn parse_with_multiple_statements() {
+    fn parse_with_statements() {
         assert_eq!(
             Block::new(
                 &"{ let a = 11451;
@@ -136,7 +136,7 @@ mod tests {
         );
     }
     #[test]
-    fn get_expression_from_multiple_line() {
+    fn get_expression_from_lines() {
         let local = &mut Environment::default();
         assert_eq!(
             Block::new(&"{let a = 11451; let b = 11452; b}".into())
@@ -145,16 +145,20 @@ mod tests {
             Expression::Binding(Identifier::new(&"b".into()).unwrap())
         );
         assert_eq!(
-            local.get_binding_by(&"a".try_into().unwrap()),
-            Some(Expression::Number(Number::from_i32(11451)))
+            local.get_from_self_and_parent(&"a".try_into().unwrap()),
+            Some(NamedValue::Binding(Expression::Number(Number::from_i32(
+                11451
+            ))))
         );
         assert_eq!(
-            local.get_binding_by(&"b".try_into().unwrap()),
-            Some(Expression::Number(Number::from_i32(11452)))
+            local.get_from_self_and_parent(&"b".try_into().unwrap()),
+            Some(NamedValue::Binding(Expression::Number(Number::from_i32(
+                11452
+            ))))
         );
     }
     #[test]
-    fn get_expression_from_multiple_expr() {
+    fn get_expression_from_expressions() {
         assert_eq!(
             Block::new(&"{114; 514; 1919;}".into())
                 .unwrap()
@@ -169,6 +173,7 @@ mod tests {
         );
     }
     #[test]
+    #[should_panic]
     fn get_block_expression_from_block() {
         // TODO: fix it
         assert_eq!(

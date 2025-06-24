@@ -21,20 +21,6 @@ impl<'a> From<&'a str> for TrimmedStr<'a> {
         Self::new(value)
     }
 }
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct TrimmedString(String);
-impl From<&TrimmedStr<'_>> for TrimmedString {
-    fn from(value: &TrimmedStr<'_>) -> Self {
-        Self(value.to_string())
-    }
-}
-impl From<&str> for TrimmedString {
-    fn from(value: &str) -> Self {
-        let trimmed_str = &TrimmedStr::new(value);
-        trimmed_str.into()
-    }
-}
 #[cfg(test)]
 mod tests {
     use super::*;

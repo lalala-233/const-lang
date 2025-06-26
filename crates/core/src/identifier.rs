@@ -12,14 +12,15 @@ impl Identifier {
         if s.is_empty() {
             return Err(IdentifierError::Empty);
         }
-        if !s.starts_with(char::is_alphabetic) {
+        if !s.starts_with(unicode_ident::is_xid_start) {
             return Err(IdentifierError::StartWithNonLetter);
         }
-        if s.chars().any(|c| !c.is_alphanumeric() && c != '_') {
-            return Err(IdentifierError::ContainSpecialCharacters);
+        if s.chars().all(unicode_ident::is_xid_continue) {
+            Ok(Self { name: s.into() })
+        } else {
+            Err(IdentifierError::ContainSpecialCharacters)
         }
         // TODO: more checks like ops, keywords, etc.
-        Ok(Self { name: s.into() })
     }
     pub fn try_get_expression_from(&self, env: &Environment) -> Result<Expression, BindingError> {
         env.get_from_self_and_parent(self)

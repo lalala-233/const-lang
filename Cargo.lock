@@ -11,9 +11,10 @@ dependencies = [
 
 [[package]]
 name = "const-lang"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "thiserror",
+ "unicode-ident",
 ]
 
 [[package]]
